@@ -52,8 +52,6 @@ src/
 └── utils/              # 순수 헬퍼 함수
 ```
 
-<br />
-
 # 🚀 Getting Started
 
 ## 의존성 설치
@@ -83,8 +81,6 @@ VITE_API_URL=http://localhost:8080/api
 VITE_APP_TITLE=My App
 ```
 
-<br />
-
 # 📖 Usage Guide
 
 ## API 요청 (ofetch)
@@ -102,8 +98,6 @@ await api('/login', {
 })
 ```
 
-<br />
-
 ## 데이터 페칭 (TanStack Query)
 
 서버 데이터는 반드시 useQuery를 사용해 관리합니다. (Pinia 사용 지양)
@@ -114,8 +108,6 @@ const { data, isLoading, isError } = useQuery({
   queryFn: () => api('/sessions') // API 호출 함수
 })
 ```
-
-<br />
 
 ## 동적 레이아웃 (Dynamic Layouts)
 
@@ -141,8 +133,6 @@ const routes = [
 ]
 ```
 
-<br />
-
 ## 개발 편의성 (Auto Import)
 
 unplugin-auto-import가 설정되어 있어 아래 함수들은 import 없이 바로 사용할 수 있습니다.
@@ -151,8 +141,6 @@ unplugin-auto-import가 설정되어 있어 아래 함수들은 import 없이 �
 - **Router**: `useRouter`, `useRoute`
 - **Pinia**: `storeToRefs`
 - **Utils**: `useStorage` (VueUse)
-
-<br />
 
 ## 🎨 Styling (Tailwind CSS v4)
 
