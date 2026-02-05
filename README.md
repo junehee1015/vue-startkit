@@ -1,0 +1,166 @@
+# 🚀 Vue 3 Startkit
+
+실무 수준의 확장성과 생산성을 고려하여 구성된 Vue 3 프로젝트 템플릿입니다.  
+최신 Vue 생태계의 Best Practice를 모아두었으며, 바로 비즈니스 로직 개발에 집중할 수 있도록 설정되어 있습니다.
+
+## 🛠 Tech Stack
+
+### Core
+
+- **Framework**: [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`)
+- **Build Tool**: [Vite 6](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Routing**: [Vue Router 4](https://router.vuejs.org/) (Manual Routing)
+
+### State & Data
+
+- **Global State**: [Pinia](https://pinia.vuejs.org/) + `pinia-plugin-persistedstate` (새로고침 유지)
+- **Server State**: [TanStack Query v5](https://tanstack.com/query/latest) (API 캐싱, 로딩, 에러 관리)
+- **HTTP Client**: [Ofetch](https://github.com/unjs/ofetch) (Fetch API Wrapper)
+
+### UI & Styling
+
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (Oxide Engine)
+- **Headless UI**: [Radix Vue](https://www.radix-vue.com/) (접근성, 키보드 조작)
+- **Icons**: [Lucide Vue Next](https://lucide.dev/guide/packages/lucide-vue-next)
+- **Toast**: [Vue Sonner](https://vue-sonner.vercel.app/)
+
+### Forms & Utilities
+
+- **Validation**: [Vee-Validate](https://vee-validate.logaretm.com/v4/) + [Zod](https://zod.dev/)
+- **Date**: [Day.js](https://day.js.org/)
+- **Hooks**: [VueUse](https://vueuse.org/)
+
+---
+
+## 📂 Folder Structure
+
+```text
+src/
+├── api/                # API 통신 설정 및 서비스 로직
+│   └── http.ts         # ofetch 인스턴스 (Interceptor 설정됨)
+├── assets/             # 정적 리소스 (이미지, 폰트, CSS)
+├── components/         # UI 컴포넌트
+│   ├── common/         # 버튼, 인풋 등 원자 단위 컴포넌트
+│   └── layout/         # 헤더, 사이드바 등 레이아웃 컴포넌트
+├── composables/        # 재사용 가능한 로직 (Custom Hooks)
+├── layouts/            # 페이지 레이아웃 (Default, Empty 등)
+├── pages/              # 실제 라우팅되는 페이지 (Views)
+├── router/             # 라우터 설정 (index.ts)
+├── stores/             # Pinia 전역 상태 스토어
+├── types/              # TypeScript 인터페이스 및 Zod 스키마
+└── utils/              # 순수 헬퍼 함수
+```
+
+<br />
+
+# 🚀 Getting Started
+
+## 의존성 설치
+
+```
+npm install
+```
+
+## 개발 서버 실행
+
+```
+npm run dev
+```
+
+## 배포 서버 실행
+
+```
+npm run build
+```
+
+## 환경 변수 설정
+
+루트 경로에 .env 파일을 생성하고 API 주소를 설정하세요.
+
+```
+VITE_API_URL=http://localhost:8080/api
+VITE_APP_TITLE=My App
+```
+
+<br />
+
+# 📖 Usage Guide
+
+## API 요청 (ofetch)
+
+`src/api/api.ts`에 토큰 자동 주입 및 에러 인터셉터가 설정되어 있습니다.
+
+```
+// GET
+const users = await api('/users')
+
+// POST
+await api('/login', {
+  method: 'POST',
+  body: { email: 'test@test.com' }
+})
+```
+
+<br />
+
+## 데이터 페칭 (TanStack Query)
+
+서버 데이터는 반드시 useQuery를 사용해 관리합니다. (Pinia 사용 지양)
+
+```
+const { data, isLoading, isError } = useQuery({
+  queryKey: ['sessions'], // 고유 키
+  queryFn: () => api('/sessions') // API 호출 함수
+})
+```
+
+<br />
+
+## 동적 레이아웃 (Dynamic Layouts)
+
+페이지별로 레이아웃(헤더/푸터 유무 등)을 다르게 적용할 수 있습니다.  
+문자열이 아닌 컴포넌트 자체를 import 하여 meta.layout에 할당합니다.
+
+```
+// src/router/index.ts
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import EmptyLayout from '@/layouts/EmptyLayout.vue'
+
+const routes = [
+  {
+    path: '/',
+    component: () => import('@/pages/MainPage.vue'),
+    meta: { layout: DefaultLayout } // 기본 레이아웃
+  },
+  {
+    path: '/login',
+    component: () => import('@/pages/auth/LoginPage.vue'),
+    meta: { layout: EmptyLayout } // 헤더 없는 레이아웃
+  }
+]
+```
+
+<br />
+
+## 개발 편의성 (Auto Import)
+
+unplugin-auto-import가 설정되어 있어 아래 함수들은 import 없이 바로 사용할 수 있습니다.
+
+- **Vue**: `ref`, `reactive`, `computed`, `watch`, `onMounted` ...
+- **Router**: `useRouter`, `useRoute`
+- **Pinia**: `storeToRefs`
+- **Utils**: `useStorage` (VueUse)
+
+<br />
+
+## 🎨 Styling (Tailwind CSS v4)
+
+CSS 파일 생성 없이 유틸리티 클래스로 스타일링합니다.
+
+## ✅ Convention
+
+- **Component** Name: PascalCase (`SessionCard.vue`)
+- **Variable**: camelCase
+- **Formatter**: Prettier (Save 시 자동 포맷팅 설정됨)
+- **Lint**: ESLint (Vue 3 Recommended)
