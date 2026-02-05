@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { cn } from '@/utils/cn'
-
 interface Props {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   class?: string
   disabled?: boolean
+  type?: 'button' | 'submit' | 'reset'
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  variant: 'primary',
-  size: 'md',
-})
+const {
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  class: className,
+  disabled = false
+} = defineProps<Props>()
 
 const variants = {
   primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm',
@@ -31,15 +32,15 @@ const sizes = {
 const buttonClass = computed(() => {
   return cn(
     'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50',
-    variants[props.variant],
-    sizes[props.size],
-    props.class,
+    variants[variant],
+    sizes[size],
+    className
   )
 })
 </script>
 
 <template>
-  <button :class="buttonClass" :disabled="props.disabled">
+  <button :type="type" :class="buttonClass" :disabled="disabled">
     <slot />
   </button>
 </template>

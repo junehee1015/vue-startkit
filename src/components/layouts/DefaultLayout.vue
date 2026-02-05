@@ -1,10 +1,16 @@
+<script setup lang="ts">
+</script>
+
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <header class="bg-white shadow p-4">
-      <h1 class="font-bold text-xl">My App Header</h1>
-    </header>
-    <main class="p-4 container mx-auto">
-      <slot />
-    </main>
+  <div class="min-h-screen bg-gray-50 flex">
+    <TheSidebar />
+    <div class="flex-1 flex flex-col ml-64">
+      <TheHeader />
+      <main class="flex-1 p-6 mt-14 overflow-y-auto">
+        <slot />
+      </main>
+      <TheFooter />
+    </div>
+
   </div>
 </template>

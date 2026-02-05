@@ -13,7 +13,7 @@ const route = useRoute()
     <RouterView />
   </component>
 
-  <Toaster position="top-right" />
+  <Toaster position="top-center" rich-colors />
   <ConfirmDialog />
 
   <VueQueryDevtools />

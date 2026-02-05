@@ -41,3 +41,6 @@ __screenshots__/
 # auto import
 auto-imports.d.ts
 components.d.ts
+
+# page router
+typed-router.d.ts

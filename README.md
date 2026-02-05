@@ -10,7 +10,7 @@
 - **Framework**: [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`)
 - **Build Tool**: [Vite 6](https://vitejs.dev/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Routing**: [Vue Router 4](https://router.vuejs.org/) (Manual Routing)
+- **Routing**: [unplugin-vue-router](https://github.com/posva/unplugin-vue-router) (File-based Routing + Typed Routes)
 
 ### State & Data
 
@@ -37,16 +37,16 @@
 
 ```text
 src/
-├── api/                # API 통신 설정 및 서비스 로직
-│   └── http.ts         # ofetch 인스턴스 (Interceptor 설정됨)
+├── api/                # API 통신 설정 및 서비스 로직 (Auto Import)
+│   └── api.ts          # ofetch 인스턴스 (Interceptor 설정됨)
 ├── assets/             # 정적 리소스 (이미지, 폰트, CSS)
 ├── components/         # UI 컴포넌트
 │   ├── common/         # 버튼, 인풋 등 원자 단위 컴포넌트
 │   └── layout/         # 헤더, 사이드바 등 레이아웃 컴포넌트
 ├── composables/        # 재사용 가능한 로직 (Custom Hooks)
-├── layouts/            # 페이지 레이아웃 (Default, Empty 등)
-├── pages/              # 실제 라우팅되는 페이지 (Views)
-├── router/             # 라우터 설정 (index.ts)
+├── layouts/            # 페이지 레이아웃 (Default, Empty - Auto Import)
+├── pages/              # 파일 기반 라우팅 페이지 (Views)
+├── router/             # 라우터 설정 (auto-routes 플러그인 연결)
 ├── stores/             # Pinia 전역 상태 스토어
 ├── types/              # TypeScript 인터페이스 및 Zod 스키마
 └── utils/              # 순수 헬퍼 함수
@@ -83,64 +83,88 @@ VITE_APP_TITLE=My App
 
 # 📖 Usage Guide
 
-## API 요청 (ofetch)
+## 1. 파일 기반 라우팅 (File-based Routing)
+
+`src/pages` 폴더 내의 파일 구조가 곧 URL 경로가 됩니다. `definePage` 매크로를 사용하여 메타 데이터(레이아웃, 타이틀 등)를 설정합니다.
+
+```html
+<script setup lang="ts">
+  // import 불필요 (Auto Import)
+  definePage({
+    meta: {
+      layout: EmptyLayout, // src/layouts 폴더 자동 스캔
+      title: '로그인',
+      requiresAuth: false,
+    },
+  })
+</script>
+```
+
+## 2. 폼 유효성 검사 (Vee-Validate + Zod)
+
+`v-bind`와 `defineField`를 사용하여 간결하게 폼을 구성합니다.
+
+```html
+<script setup lang="ts">
+  // 모든 유틸리티 Auto Import 됨 (import 문 불필요)
+
+  const schema = toTypedSchema(
+    z.object({
+      email: z.string().email(),
+      password: z.string().min(6),
+    }),
+  )
+
+  const { handleSubmit, defineField, errors } = useForm({ validationSchema: schema })
+  const [email, emailProps] = defineField('email')
+</script>
+
+<template>
+  <form @submit="handleSubmit(onSubmit)">
+    <BaseFormField label="이메일" :error-message="errors.email">
+      <BaseInput v-model="email" v-bind="emailProps" :invalid="!!errors.email" />
+    </BaseFormField>
+    <BaseButton type="submit">전송</BaseButton>
+  </form>
+</template>
+```
+
+## 3. API 요청 (ofetch)
 
 `src/api/api.ts`에 토큰 자동 주입 및 에러 인터셉터가 설정되어 있습니다.
 
-```
+```ts
 // GET
 const users = await api('/users')
 
 // POST
 await api('/login', {
   method: 'POST',
-  body: { email: 'test@test.com' }
+  body: { email: 'test@test.com' },
 })
 ```
 
-## 데이터 페칭 (TanStack Query)
+## 4. 데이터 페칭 (TanStack Query)
 
 서버 데이터는 반드시 useQuery를 사용해 관리합니다. (Pinia 사용 지양)
 
-```
+```ts
 const { data, isLoading, isError } = useQuery({
   queryKey: ['sessions'], // 고유 키
-  queryFn: () => api('/sessions') // API 호출 함수
+  queryFn: () => api('/sessions'), // API 호출 함수
 })
 ```
 
-## 동적 레이아웃 (Dynamic Layouts)
+## 5. 강력한 Auto Import
 
-페이지별로 레이아웃(헤더/푸터 유무 등)을 다르게 적용할 수 있습니다.  
-문자열이 아닌 컴포넌트 자체를 import 하여 meta.layout에 할당합니다.
-
-```
-// src/router/index.ts
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import EmptyLayout from '@/layouts/EmptyLayout.vue'
-
-const routes = [
-  {
-    path: '/',
-    component: () => import('@/pages/MainPage.vue'),
-    meta: { layout: DefaultLayout } // 기본 레이아웃
-  },
-  {
-    path: '/login',
-    component: () => import('@/pages/auth/LoginPage.vue'),
-    meta: { layout: EmptyLayout } // 헤더 없는 레이아웃
-  }
-]
-```
-
-## 개발 편의성 (Auto Import)
-
-unplugin-auto-import가 설정되어 있어 아래 함수들은 import 없이 바로 사용할 수 있습니다.
+개발 생산성을 위해 대부분의 라이브러리와 내부 모듈이 자동으로 import 됩니다.
 
 - **Vue**: `ref`, `reactive`, `computed`, `watch`, `onMounted` ...
-- **Router**: `useRouter`, `useRoute`
+- **Components** : `DefaultLayout`, `BaseButton`
+- **Project**: `src/api`, `src/composables`, `src/utils` 내부 파일들
+- **Router**: `useRouter`, `useRoute`, `definePage`
 - **Pinia**: `storeToRefs`
-- **Utils**: `useStorage` (VueUse)
+- **VueUse**: `useStorage`
 
 ## 🎨 Styling (Tailwind CSS v4)
 
@@ -148,7 +172,9 @@ CSS 파일 생성 없이 유틸리티 클래스로 스타일링합니다.
 
 ## ✅ Convention
 
-- **Component** Name: PascalCase (`SessionCard.vue`)
+- **Page Component**: File-based Routing 규칙에 따름 (index.vue, [id].vue)
+- **Component** Name: PascalCase (`BaseButton.vue`, `TheHeader.vue`)
 - **Variable**: camelCase
+- **Layout**: `src/layouts` 폴더에 위치하며, `definePage`를 통해 적용
 - **Formatter**: Prettier (Save 시 자동 포맷팅 설정됨)
 - **Lint**: ESLint (Vue 3 Recommended)

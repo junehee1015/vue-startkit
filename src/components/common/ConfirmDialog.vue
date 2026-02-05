@@ -9,7 +9,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from 'radix-vue'
-import { useConfirmState } from '@/composables/useConfirm'
 
 const { isOpen, options, handleConfirm, handleCancel } = useConfirmState()
 </script>
@@ -17,13 +16,10 @@ const { isOpen, options, handleConfirm, handleCancel } = useConfirmState()
 <template>
   <AlertDialogRoot v-model:open="isOpen">
     <AlertDialogPortal>
-      <AlertDialogOverlay
-        class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in-0"
-      />
+      <AlertDialogOverlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in-0" />
 
       <AlertDialogContent
-        class="fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-6 shadow-lg animate-in zoom-in-95"
-      >
+        class="fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-6 shadow-lg animate-in zoom-in-95">
         <div class="flex flex-col space-y-2 text-center sm:text-left">
           <AlertDialogTitle class="text-lg font-semibold">
             {{ options.title }}
@@ -41,10 +37,7 @@ const { isOpen, options, handleConfirm, handleCancel } = useConfirmState()
           </AlertDialogCancel>
 
           <AlertDialogAction as-child>
-            <BaseButton
-              :variant="options.variant === 'danger' ? 'danger' : 'primary'"
-              @click="handleConfirm"
-            >
+            <BaseButton :variant="options.variant === 'danger' ? 'danger' : 'primary'" @click="handleConfirm">
               {{ options.confirmText }}
             </BaseButton>
           </AlertDialogAction>
