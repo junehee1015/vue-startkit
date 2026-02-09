@@ -2,14 +2,12 @@
 import { Toaster } from 'vue-sonner'
 import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 
-import DefaultLayout from '@/components/layouts/DefaultLayout.vue'
-
 const route = useRoute()
 </script>
 
 <template>
   <!-- 라우터 meta에 layout 설정이 없으면 Default 사용 -->
-  <component :is="route.meta.layout || DefaultLayout">
+  <component :is="route.meta.layout || 'div'">
     <RouterView />
   </component>
 
