@@ -19,14 +19,19 @@ const authStore = useAuthStore()
 
 const validationSchema = toTypedSchema(
   z.object({
-    email: z.string().min(1, '이메일을 입력해주세요.').email('올바른 이메일 형식이 아닙니다.'),
-    password: z.string().min(1, '비밀번호를 입력해주세요.'),
+    email: z.string().min(1, '아이디를 입력해주세요.').email('올바른 이메일 형식이 아닙니다.'),
+    password: z.string('비밀번호를 입력해주세요.').min(1, '비밀번호를 입력해주세요.'),
     rememberMe: z.boolean().optional(),
   }),
 )
 
 const { handleSubmit, isSubmitting, defineField, errors } = useForm({
   validationSchema,
+  initialValues: {
+    email: 'admin@example.com',
+    password: 'Zxcv@1234',
+    rememberMe: false,
+  },
 })
 
 const [email, emailProps] = defineField('email')

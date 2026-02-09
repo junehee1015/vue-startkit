@@ -18,7 +18,7 @@ export const useAuthStore = defineStore(
       // 백엔드 없이 프론트에서만 처리하므로 가짜 지연 시간과 데이터 주입
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      if (values.email !== 'admin@example.com' || values.password !== '1234') {
+      if (values.email !== 'admin@example.com' || values.password !== 'Zxcv@1234') {
         throw new Error('아이디 또는 비밀번호가 일치하지 않습니다.')
       }
 
