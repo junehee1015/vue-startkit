@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { definePage } from 'unplugin-vue-router/runtime'
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import * as z from 'zod'
-import { toast } from 'vue-sonner'
 import EmptyLayout from '@/components/layouts/EmptyLayout.vue'
 
 definePage({
@@ -17,6 +12,8 @@ definePage({
 const router = useRouter()
 const authStore = useAuthStore()
 
+const savedEmail = localStorage.getItem('saved_email')
+
 const validationSchema = toTypedSchema(
   z.object({
     email: z.email('올바른 이메일 형식이 아닙니다.').min(1, '아이디를 입력해주세요.'),
@@ -28,9 +25,9 @@ const validationSchema = toTypedSchema(
 const { handleSubmit, isSubmitting, defineField, errors } = useForm({
   validationSchema,
   initialValues: {
-    email: 'admin@example.com',
-    password: 'Zxcv@1234',
-    rememberMe: false,
+    email: savedEmail || '',
+    password: '1234',
+    rememberMe: !!savedEmail,
   },
 })
 
@@ -42,10 +39,14 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     await authStore.login(values)
 
-    console.log('로그인 성공:', values)
-    toast.success('로그인되었습니다.')
+    if (values.rememberMe) {
+      localStorage.setItem('saved_email', values.email)
+    } else {
+      localStorage.removeItem('saved_email')
+    }
 
-    router.push('/')
+    toast.success('로그인되었습니다.')
+    await router.replace('/')
   } catch (_error) {
     toast.error('로그인에 실패했습니다.')
   }
@@ -59,20 +60,22 @@ const onSubmit = handleSubmit(async (values) => {
     </div>
 
     <form @submit="onSubmit" class="space-y-6">
-      <BaseFormField label="이메일" :error-message="errors.email">
+      <BaseFormField label="이메일" :error-message="errors.email" v-slot="{ id }">
         <BaseInput
           v-model="email"
           v-bind="emailProps"
+          :id="id"
           type="email"
           placeholder="admin@example.com"
           :invalid="!!errors.email"
         />
       </BaseFormField>
 
-      <BaseFormField label="비밀번호" :error-message="errors.password">
+      <BaseFormField label="비밀번호" :error-message="errors.password" v-slot="{ id }">
         <BaseInput
           v-model="password"
           v-bind="passwordProps"
+          :id="id"
           type="password"
           placeholder="••••••••"
           :invalid="!!errors.password"

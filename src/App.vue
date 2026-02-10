@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { Toaster } from 'vue-sonner'
 import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
-
-const route = useRoute()
+import DefaultLayout from './components/layouts/DefaultLayout.vue'
 </script>
 
 <template>
-  <!-- 라우터 meta에 layout 설정이 없으면 Default 사용 -->
-  <component :is="route.meta.layout || 'div'">
-    <RouterView />
-  </component>
+  <RouterView v-slot="{ Component, route }">
+    <component :is="route.meta.layout || DefaultLayout">
+      <component :is="Component" />
+    </component>
+  </RouterView>
 
   <Toaster position="top-center" rich-colors />
   <ConfirmDialog />
-
   <VueQueryDevtools />
 </template>

@@ -10,7 +10,7 @@ const authStore = useAuthStore()
 
 const breadcrumbs = computed(() => {
   const currentLabel = (route.meta.breadcrumb as string) || '페이지'
-  return [{ label: 'Home', to: '/' }, { label: currentLabel }]
+  return [{ label: currentLabel }]
 })
 
 const userMenuItems: DropdownItem[] = [

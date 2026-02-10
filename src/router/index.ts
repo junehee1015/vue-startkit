@@ -1,29 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
-import type { RouteRecordRaw } from 'vue-router'
-import DefaultLayout from '@/components/layouts/DefaultLayout.vue'
-
-// 이미 meta.layout이 설정되어 있다면(예: 로그인 페이지) 건너뜀
-const setupLayouts = (routes: readonly RouteRecordRaw[]): RouteRecordRaw[] => {
-  return routes.map((route) => {
-    const newRoute = { ...route }
-
-    newRoute.meta = {
-      ...route.meta,
-      requiresAuth: route.meta?.requiresAuth ?? true,
-      layout: route.meta?.layout || DefaultLayout,
-    }
-
-    if (route.children) {
-      newRoute.children = setupLayouts(route.children)
-    }
-    return newRoute
-  })
-}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
+  routes,
 })
 
 // 네비게이션 가드 설정
@@ -36,11 +16,14 @@ router.beforeEach((to, _from, next) => {
     return next()
   }
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  const isPublic = to.meta.requiresAuth === false
+
+  // 로그인이 안되어 있으면 로그인
+  if (!isPublic && !authStore.isAuthenticated) {
     return next('/login')
   }
 
-  // 3. 공개 페이지, requiresAuth가 false인 경우 (404 등)
+  // 공개 페이지, requiresAuth가 false인 경우 (404 등)
   next()
 })
 

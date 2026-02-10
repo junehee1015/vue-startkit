@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import router from '@/router'
 
+interface User {
+  name: string
+  email: string
+  role: string
+}
 export interface LoginPayload {
   email: string
   password: string
@@ -9,40 +14,70 @@ export interface LoginPayload {
 export const useAuthStore = defineStore(
   'auth',
   () => {
-    const user = ref<{ name: string; email: string; role: string } | null>(null)
-    const token = ref<string | null>(null)
+    const user = ref<User | null>(null)
+    const accessToken = ref<string | null>(null)
+    const refreshToken = ref<string | null>(null)
 
-    const isAuthenticated = computed(() => !!token.value)
+    const isAuthenticated = computed(() => !!accessToken.value)
 
+    // 1. 로그인
     const login = async (values: LoginPayload) => {
-      // 백엔드 없이 프론트에서만 처리하므로 가짜 지연 시간과 데이터 주입
+      // API 지연 시뮬레이션
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      if (values.email !== 'admin@example.com' || values.password !== 'Zxcv@1234') {
+      if (values.email !== 'admin@example.com' || values.password !== '1234') {
         throw new Error('아이디 또는 비밀번호가 일치하지 않습니다.')
       }
 
-      // 가짜 토큰과 유저 정보 저장
-      token.value = 'mock-jwt-token-12345'
+      // 토큰 발급 (실제로는 서버에서 받아옴)
+      accessToken.value = 'mock-access-token-' + Date.now()
+      refreshToken.value = 'mock-refresh-token-' + Date.now()
+
       user.value = {
         name: 'Juny Jo',
         email: values.email,
         role: 'Admin',
       }
-
-      return true
     }
 
-    const logout = () => {
+    // 2. 토큰 갱신 (Mock)
+    // Access Token이 만료되었을 때 호출됨
+    const refreshAccessToken = async (): Promise<void> => {
+      try {
+        // API 지연 시뮬레이션
+        await new Promise((resolve) => setTimeout(resolve, 300))
+
+        // 리프레시 토큰이 없으면 실패 처리
+        if (!refreshToken.value) throw new Error('No refresh token')
+
+        // 리프레시 토큰을 서버에 보내고 새 엑세스 토큰을 받음
+        const newAccessToken = 'new-access-token-' + Date.now()
+
+        accessToken.value = newAccessToken
+      } catch (error) {
+        logout() // 갱신 실패 시 강제 로그아웃
+        throw error
+      }
+    }
+
+    // 3. 로그아웃
+    const logout = async () => {
       user.value = null
-      token.value = null
+      accessToken.value = null
+      refreshToken.value = null
+
+      localStorage.removeItem('auth')
+
+      router.currentRoute.value.path !== '/login' && (await router.replace('/login'))
     }
 
     return {
       user,
-      token,
+      accessToken,
+      refreshToken,
       isAuthenticated,
       login,
+      refreshAccessToken,
       logout,
     }
   },

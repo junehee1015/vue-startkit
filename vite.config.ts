@@ -11,7 +11,7 @@ import Components from 'unplugin-vue-components/vite'
 export default defineConfig({
   plugins: [
     VueRouter({
-      dts: 'src/typed-router.d.ts',
+      dts: 'src/types/typed-router.d.ts',
     }),
     vue(),
     vueDevTools(),
@@ -23,22 +23,26 @@ export default defineConfig({
         '@vueuse/core',
         VueRouterAutoImports,
         {
+          'vee-validate': ['useForm', 'useField', 'defineField', 'useFieldArray', 'configure'],
+          '@vee-validate/zod': ['toTypedSchema'],
+          zod: ['z'],
           'vue-router/auto': ['useLink'],
+          'vue-sonner': ['toast'],
           '@tanstack/vue-query': ['useQuery', 'useMutation', 'useQueryClient'],
         },
       ],
       dirs: [
         './src/api/**',
-        './src/layouts/**',
         './src/composables/**',
-        './src/utils/**',
+        './src/plugins/**',
         './src/stores/**',
+        './src/utils/**',
       ],
-      dts: 'src/auto-imports.d.ts',
+      dts: 'src/types/auto-imports.d.ts',
       vueTemplate: true,
     }),
     Components({
-      dts: 'src/components.d.ts',
+      dts: 'src/types/components.d.ts',
     }),
   ],
   server: {

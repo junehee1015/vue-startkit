@@ -1,22 +1,18 @@
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-import { VueQueryPlugin } from '@tanstack/vue-query'
-import { queryClient } from '@/utils/query-client'
-
 import App from './App.vue'
-import router from './router'
+import router from '@/router'
 
 import './style.css'
 import 'vue-sonner/style.css'
 
-const app = createApp(App)
-const pinia = createPinia()
+const initApp = async () => {
+  const app = createApp(App)
 
-pinia.use(piniaPluginPersistedstate)
+  registerPlugins(app)
 
-app.use(pinia)
-app.use(router)
-app.use(VueQueryPlugin, { queryClient })
+  await router.isReady()
 
-app.mount('#app')
+  app.mount('#app')
+}
+
+initApp()
