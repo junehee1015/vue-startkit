@@ -26,11 +26,15 @@ const { items, class: className } = defineProps<Props>()
       <li v-for="(item, index) in items" :key="index" class="flex items-center">
         <ChevronRight class="h-4 w-4 text-gray-400 mx-1" />
 
-        <RouterLink v-if="item.to" :to="item.to" class="hover:text-gray-900 transition-colors font-medium">
+        <RouterLink
+          v-if="item.to"
+          :to="item.to"
+          class="hover:text-gray-900 transition-colors font-medium"
+        >
           {{ item.label }}
         </RouterLink>
 
-        <span v-else class="font-semibold text-gray-900">
+        <span v-else class="font-semibold text-gray-900" aria-current="page">
           {{ item.label }}
         </span>
       </li>

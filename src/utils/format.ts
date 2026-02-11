@@ -1,5 +1,3 @@
-import dayjs from 'dayjs'
-
 /**
  * 날짜 포맷팅
  */
@@ -24,10 +22,13 @@ export const formatNumber = (num: number | string | undefined | null): string =>
 }
 
 /**
- * 금액 표시 (예: 10000 -> "10,000원")
+ * 금액 표시 (예: 10000 -> "₩10,000")
  */
-export const formatCurrency = (amount: number | string, currency = '원'): string => {
-  return `${formatNumber(amount)}${currency}`
+export const formatCurrency = (amount: number, currency = 'KRW') => {
+  return new Intl.NumberFormat('ko-KR', {
+    style: 'currency',
+    currency,
+  }).format(amount)
 }
 
 /**

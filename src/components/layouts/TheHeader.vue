@@ -5,28 +5,26 @@ import type { DropdownItem } from '../common/BaseDropdown.vue'
 import { toast } from 'vue-sonner'
 
 const route = useRoute()
-const router = useRouter()
 const authStore = useAuthStore()
 
 const breadcrumbs = computed(() => {
-  const currentLabel = (route.meta.breadcrumb as string) || '페이지'
-  return [{ label: currentLabel }]
+  return route.matched
+    .filter((r) => r.meta?.breadcrumb) // breadcrumb 메타가 있는 것만 필터링
+    .map((r) => ({
+      label: r.meta.breadcrumb as string,
+      to: r.path !== route.path ? r.path : undefined, // 현재 페이지가 아니면 링크 부여
+    }))
 })
 
 const userMenuItems: DropdownItem[] = [
-  { label: '내 프로필', icon: User },
+  { label: '프로필', icon: User, onClick: () => alert('Profile') },
   { label: '설정', icon: Settings },
-  {
-    label: '로그아웃',
-    icon: LogOut,
-    danger: true,
-    separator: true,
-    onClick: () => logout(),
-  },
+  { separator: true },
+  { label: '로그아웃', icon: LogOut, danger: true, onClick: () => logout() },
 ]
 
 const logout = async () => {
-  const isConfirmed = await openConfirm({
+  const isConfirmed = await useConfirm({
     title: '로그아웃 하시겠습니까?',
     cancelText: '취소',
     confirmText: '확인',
@@ -37,7 +35,6 @@ const logout = async () => {
   authStore.logout()
 
   toast.error('로그아웃 되었습니다.')
-  router.push('/login')
 }
 </script>
 

@@ -8,9 +8,11 @@ import {
   PaginationEllipsis,
 } from 'radix-vue'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-vue-next'
+import { cn } from '@/utils/cn'
 
 interface Props {
-  total: number
+  total: number // 전체 아이템 개수
+  itemsPerPage?: number // 페이지당 아이템 개수 (기본 10)
   siblingCount?: number
   showEdges?: boolean
   class?: string
@@ -18,48 +20,60 @@ interface Props {
 }
 
 const {
-  total = 0,
+  total,
+  itemsPerPage = 10,
   siblingCount = 1,
   showEdges = false,
   class: className,
-  disabled = false
+  disabled = false,
 } = defineProps<Props>()
 
 const page = defineModel<number>('page', { default: 1 })
 </script>
 
 <template>
-  <PaginationRoot v-model:page="page" :total="total" :sibling-count="siblingCount" :show-edges="showEdges"
-    :disabled="disabled" :class="cn('flex items-center gap-1', className)">
+  <PaginationRoot
+    v-model:page="page"
+    :total="total"
+    :items-per-page="itemsPerPage"
+    :sibling-count="siblingCount"
+    :show-edges="showEdges"
+    :disabled="disabled"
+    :class="cn('flex items-center gap-1', className)"
+  >
     <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-
       <PaginationPrev as-child>
-        <BaseButton variant="outline" size="sm" class="w-9 h-9 p-0" :disabled="page === 1 || disabled">
+        <BaseButton variant="outline" size="sm" class="w-9 h-9 p-0" :disabled="disabled">
           <ChevronLeft class="h-4 w-4" />
         </BaseButton>
       </PaginationPrev>
 
       <template v-for="(item, index) in items">
-
         <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-          <BaseButton size="sm" class="w-9 h-9 p-0 transition-all" :variant="item.value === page ? 'primary' : 'ghost'"
-            :disabled="disabled">
+          <BaseButton
+            size="sm"
+            class="w-9 h-9 p-0 transition-all"
+            :variant="item.value === page ? 'primary' : 'ghost'"
+            :disabled="disabled"
+          >
             {{ item.value }}
           </BaseButton>
         </PaginationListItem>
 
-        <PaginationEllipsis v-else :key="item.type" class="flex h-9 w-9 items-center justify-center">
+        <PaginationEllipsis
+          v-else
+          :key="item.type"
+          class="flex h-9 w-9 items-center justify-center"
+        >
           <MoreHorizontal class="h-4 w-4 opacity-50" />
         </PaginationEllipsis>
-
       </template>
 
       <PaginationNext as-child>
-        <BaseButton variant="outline" size="sm" class="w-9 h-9 p-0" :disabled="page === total || disabled">
+        <BaseButton variant="outline" size="sm" class="w-9 h-9 p-0" :disabled="disabled">
           <ChevronRight class="h-4 w-4" />
         </BaseButton>
       </PaginationNext>
-
     </PaginationList>
   </PaginationRoot>
 </template>

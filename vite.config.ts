@@ -23,6 +23,7 @@ export default defineConfig({
         '@vueuse/core',
         VueRouterAutoImports,
         {
+          dayjs: ['dayjs'],
           'vee-validate': ['useForm', 'useField', 'defineField', 'useFieldArray', 'configure'],
           '@vee-validate/zod': ['toTypedSchema'],
           zod: ['z'],

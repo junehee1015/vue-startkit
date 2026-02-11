@@ -9,7 +9,7 @@ import {
 } from 'radix-vue'
 
 interface Props {
-  content: string
+  content?: string
   side?: 'top' | 'right' | 'bottom' | 'left'
   align?: 'start' | 'center' | 'end'
   delayDuration?: number
@@ -21,7 +21,7 @@ const {
   side = 'top',
   align = 'center',
   delayDuration = 200,
-  class: className
+  class: className,
 } = defineProps<Props>()
 </script>
 
@@ -33,11 +33,20 @@ const {
       </TooltipTrigger>
 
       <TooltipPortal>
-        <TooltipContent :side="side" :align="align" :side-offset="5" :class="cn(
-          'z-50 overflow-hidden rounded-md bg-gray-900 px-3 py-1.5 text-xs text-white animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-          className
-        )">
-          {{ content }}
+        <TooltipContent
+          :side="side"
+          :align="align"
+          :side-offset="5"
+          :class="
+            cn(
+              'z-50 overflow-hidden rounded-md bg-gray-900 px-3 py-1.5 text-xs text-white animate-in fade-in-0 zoom-in-95',
+              className,
+            )
+          "
+        >
+          <slot name="content">
+            {{ content }}
+          </slot>
           <TooltipArrow class="fill-gray-900" />
         </TooltipContent>
       </TooltipPortal>

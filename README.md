@@ -5,15 +5,13 @@
 
 ## ✨ Key Features
 
-- **Latest Stack**: Vue 3.5+, Vite 6, TypeScript 5
-- **Styling**: Tailwind CSS v4 (Oxide Engine) + Radix Vue (Headless UI)
 - **Architecture**:
   - **FSD Lite**: 도메인 주도 설계를 위한 API 모듈화 및 Composable 패턴
   - **3-Layer Fetching**: `API Definition` -> `Query Composable` -> `View Component`
-- **DX (Developer Experience)**:
-  - **Auto Import** (Vue, Router, Pinia, Zod...)
+- **Developer Experience**:
+  - **Auto Import**: Vue, Router, Pinia, Zod 등 자동 임포트
   - **File-based Routing** (`unplugin-vue-router`)
-- **Robust Auth**: JWT 핸들링, Refresh Token **동시성 제어(Race Condition)** 완벽 처리
+- **Robust Auth**: ofetch를 활용한 JWT 핸들링, Refresh Token **동시성 제어(Race Condition)** 완벽 처리
 
 ---
 
@@ -43,9 +41,9 @@ src/
 ├── components/
 │   ├── common/             # 원자 단위 공통 컴포넌트 (BaseButton, BaseInput...)
 │   └── guide/              # (개발 가이드용 컴포넌트 - 배포 시 제외 가능)
+│   └── layouts/            # 페이지 레이아웃 (Default, Empty)
 ├── composables/            # 재사용 가능한 로직
 │   └── queries/            # TanStack Query 훅 모음 (useUserQueries.ts)
-├── layouts/                # 페이지 레이아웃 (Default, Empty)
 ├── pages/                  # 파일 기반 라우팅 (File-based Routing)
 ├── plugins/                # App Bootstrapping (Pinia, Router, Query 설정 분리)
 ├── stores/                 # Pinia 전역 스토어 (Client State)
@@ -159,9 +157,8 @@ definePage({
 
 - **Vue**: `ref`, `computed`, `watch`, `onMounted` ...
 - **Router**: `useRouter`, `useRoute`, `definePage`
-- **Store**: `storeToRefs`
 - **Validation**: `useForm`, `z` (Zod)
-- **Project**: `api` (request), `composables/**` 내부 파일들
+- **Project**: `./src/api/**`, `./src/composables/**`, `./src/plugins/**`, `./src/stores/**`, `./src/utils/** `,
 
 ---
 

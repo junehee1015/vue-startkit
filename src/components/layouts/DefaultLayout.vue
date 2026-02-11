@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="min-h-screen bg-gray-50 flex">
@@ -11,6 +10,5 @@
       </main>
       <TheFooter />
     </div>
-
   </div>
 </template>

@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { Loader2 } from 'lucide-vue-next'
+
 interface Props {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   class?: string
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
+  loading?: boolean
+  to?: string
 }
 
 const {
@@ -12,7 +16,9 @@ const {
   size = 'md',
   type = 'button',
   class: className,
-  disabled = false
+  disabled = false,
+  loading = false,
+  to,
 } = defineProps<Props>()
 
 const variants = {
@@ -34,13 +40,20 @@ const buttonClass = computed(() => {
     'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50',
     variants[variant],
     sizes[size],
-    className
+    className,
   )
 })
 </script>
 
 <template>
-  <button :type="type" :class="buttonClass" :disabled="disabled">
+  <component
+    :is="to ? 'RouterLink' : 'button'"
+    :to="to"
+    :type="to ? undefined : type"
+    :class="[buttonClass, loading && 'opacity-70 cursor-wait']"
+    :disabled="disabled || loading"
+  >
+    <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
     <slot />
-  </button>
+  </component>
 </template>

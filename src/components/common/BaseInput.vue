@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import { useId } from 'vue'
-import { cn } from '@/utils/cn'
-
-defineOptions({
-  inheritAttrs: false,
-})
+defineOptions({ inheritAttrs: false })
 
 interface Props {
   class?: string
@@ -13,9 +8,7 @@ interface Props {
 }
 
 const { class: className, id, invalid = false } = defineProps<Props>()
-
 const model = defineModel<string | number>()
-
 const inputId = id || useId()
 </script>
 
@@ -27,7 +20,9 @@ const inputId = id || useId()
       v-bind="$attrs"
       :class="
         cn(
-          'flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50',
+          'flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm',
+          'placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           invalid && 'border-red-500 focus-visible:ring-red-500',
           className,
         )
