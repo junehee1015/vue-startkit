@@ -1,6 +1,6 @@
 # 🚀 Vue Startkit
 
-실무 수준의 **확장성(Scalability)**과 **유지보수성(Maintainability)**을 최우선으로 고려한 Vue 3 프로젝트 템플릿입니다.  
+실무 수준의 **확장성(Scalability)** 과 **유지보수성(Maintainability)** 을 최우선으로 고려한 Vue 3 프로젝트 템플릿입니다.  
 최신 Vue 생태계의 Best Practice가 적용되어 있으며, 복잡한 초기 설정 없이 바로 비즈니스 로직 개발에 집중할 수 있습니다.
 
 ## ✨ Key Features
