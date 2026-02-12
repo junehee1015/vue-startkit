@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import EmptyLayout from '@/components/layouts/EmptyLayout.vue'
+import EmptyLayout from '@/layouts/EmptyLayout.vue'
 
 definePage({
+  name: 'not-found',
   meta: {
     layout: EmptyLayout,
     title: '404 Not Found',

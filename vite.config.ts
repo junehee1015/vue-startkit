@@ -32,18 +32,13 @@ export default defineConfig({
           '@tanstack/vue-query': ['useQuery', 'useMutation', 'useQueryClient'],
         },
       ],
-      dirs: [
-        './src/api/**',
-        './src/composables/**',
-        './src/plugins/**',
-        './src/stores/**',
-        './src/utils/**',
-      ],
+      dirs: ['./src/composables/**', './src/plugins/**', './src/stores/**', './src/utils/**'],
       dts: 'src/types/auto-imports.d.ts',
       vueTemplate: true,
     }),
     Components({
       dts: 'src/types/components.d.ts',
+      dirs: ['./src/components/**', './src/layouts/**'],
     }),
   ],
   server: {

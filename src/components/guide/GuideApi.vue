@@ -41,8 +41,7 @@
         <h3 class="text-xl font-bold text-gray-800">API 함수 정의 (Api Layer)</h3>
       </div>
       <p class="text-gray-600 text-sm">
-        <code>src/api/modules</code> 폴더에 도메인별로 파일을 생성합니다. 객체로 묶어서 export 하면
-        네임스페이스 관리가 용이합니다.
+        <code>src/api/modules</code> 폴더에 도메인별로 파일을 생성합니다.
       </p>
 
       <div class="bg-[#1e1e1e] rounded-lg overflow-hidden shadow-xl border border-gray-800">
@@ -61,11 +60,16 @@
           <pre
             v-pre
             class="text-sm font-mono leading-relaxed text-gray-300"
-          ><code><span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-blue-300">userApi</span> = {
-  <span class="text-yellow-200">get</span>: <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> <span class="text-yellow-200">request</span>&lt;<span class="text-emerald-300">User[]</span>&gt;(<span class="text-orange-300">'/users'</span>),
-  <span class="text-yellow-200">create</span>: <span class="text-yellow-400">(</span><span class="text-blue-300">data</span><span class="text-yellow-400">)</span> <span class="text-blue-400">=></span> <span class="text-yellow-200">request</span>(<span class="text-orange-300">'/users'</span>, { 
-    method: <span class="text-orange-300">'POST'</span>, 
-    body: <span class="text-blue-300">data</span> 
+          ><code><span class="text-gray-500">// Named Exports를 사용하여 불필요한 코드가 번들에 포함되지 않도록 합니다.</span>
+
+<span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">getUsers</span> = <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
+  <span class="text-purple-400">return</span> <span class="text-yellow-200">request</span>&lt;<span class="text-emerald-300">User[]</span>&gt;(<span class="text-orange-300">'/users'</span>)
+}
+
+<span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">createUser</span> = <span class="text-yellow-400">(</span><span class="text-blue-300">data</span><span class="text-yellow-400">)</span> <span class="text-blue-400">=></span> {
+  <span class="text-purple-400">return</span> <span class="text-yellow-200">request</span>&lt;<span class="text-emerald-300">User</span>&gt;(<span class="text-orange-300">'/users'</span>, {
+    method: <span class="text-orange-300">'POST'</span>,
+    body: <span class="text-blue-300">data</span>
   })
 }</code></pre>
         </div>
@@ -106,7 +110,7 @@
 <span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">useUserListQuery</span> = <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
   <span class="text-purple-400">return</span> <span class="text-yellow-200">useQuery</span>({
     queryKey: <span class="text-blue-300">QUERY_KEYS</span>.users,
-    queryFn: <span class="text-blue-300">userApi</span>.get,
+    queryFn: <span class="text-blue-300">getUsers </span>,
     <span class="text-gray-500">// staleTime: 60000 (Global Default 적용됨)</span>
   })
 }
@@ -116,7 +120,7 @@
   <span class="text-blue-400">const</span> <span class="text-blue-300">queryClient</span> = <span class="text-yellow-200">useQueryClient</span>()
   
   <span class="text-purple-400">return</span> <span class="text-yellow-200">useMutation</span>({
-    mutationFn: <span class="text-blue-300">userApi</span>.create,
+    mutationFn: <span class="text-blue-300">createUser</span>,
     <span class="text-yellow-200">onSuccess</span>: <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
       <span class="text-gray-500">// 목록 갱신</span>
       <span class="text-blue-300">queryClient</span>.<span class="text-yellow-200">invalidateQueries</span>({ queryKey: <span class="text-blue-300">QUERY_KEYS</span>.users })

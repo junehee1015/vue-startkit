@@ -1,5 +1,6 @@
 <script setup lang="ts">
 definePage({
+  name: 'guide',
   meta: {
     title: '사용자 가이드',
     breadcrumb: '사용자 가이드',

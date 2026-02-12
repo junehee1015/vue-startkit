@@ -1,4 +1,3 @@
-import { defineStore } from 'pinia'
 import router from '@/router'
 
 interface User {
@@ -44,6 +43,8 @@ export const useAuthStore = defineStore(
     // Access Token이 만료되었을 때 호출됨
     const refreshAccessToken = async (): Promise<void> => {
       try {
+        // 순환 참조 방지를 위해 순수 ofetch인 refreshRequest instance를 사용해야 함
+
         // API 지연 시뮬레이션
         await new Promise((resolve) => setTimeout(resolve, 300))
 
@@ -67,8 +68,6 @@ export const useAuthStore = defineStore(
       refreshToken.value = null
 
       localStorage.removeItem('auth')
-
-      router.currentRoute.value.path !== '/login' && (await router.replace('/login'))
     }
 
     return {

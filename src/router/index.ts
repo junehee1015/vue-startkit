@@ -1,29 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
+import { ROUTE_NAMES } from '@/constants/routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
-// 네비게이션 가드 설정
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  // 이미 로그인했으면 홈으로
-  if (to.path === '/login') {
-    if (authStore.isAuthenticated) return next('/')
-    return next()
-  }
-
+  // meta.requiresAuth가 명시적으로 false인 경우만 '공개' 페이지
+  // undefined인 경우(기본값)는 '비공개'로 간주하여 보안 강화
   const isPublic = to.meta.requiresAuth === false
+  const isAuthenticated = authStore.isAuthenticated
 
-  // 로그인이 안되어 있으면 로그인
-  if (!isPublic && !authStore.isAuthenticated) {
-    return next('/login')
+  // 비로그인 유저가 '인증 필요 페이지' 접근 시
+  if (!isPublic && !isAuthenticated) {
+    return next({
+      name: ROUTE_NAMES.LOGIN,
+    })
   }
 
-  // 공개 페이지, requiresAuth가 false인 경우 (404 등)
+  // 이미 로그인한 유저가 '로그인/회원가입' 페이지 접근 시 홈으로
+  if (isAuthenticated && to.name === ROUTE_NAMES.LOGIN) {
+    return next({ name: ROUTE_NAMES.HOME })
+  }
+
+  // 그 외 통과
   next()
 })
 

@@ -1,6 +1,8 @@
 import { ofetch } from 'ofetch'
 import type { FetchOptions, FetchError } from 'ofetch'
 import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
+import { ROUTE_NAMES } from '@/constants/routes'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -17,6 +19,12 @@ const _apiInstance = ofetch.create({
       options.headers = headers
     }
   },
+})
+
+// refreshtoken을 위한 순수 ofetch instance
+export const refreshRequest = ofetch.create({
+  baseURL: BASE_URL,
+  retry: 0,
 })
 
 // 2. 외부로 내보낼 Wrapper 함수
@@ -58,6 +66,8 @@ export const request = async <T = unknown>(
         // 4. 원래 요청 재시도
         return await _apiInstance<T>(url, options)
       } catch (refreshError) {
+        router.currentRoute.value.path !== '/login' &&
+          (await router.replace({ name: ROUTE_NAMES.LOGIN }))
         throw refreshError
       }
     }

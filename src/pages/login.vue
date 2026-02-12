@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import EmptyLayout from '@/components/layouts/EmptyLayout.vue'
+import EmptyLayout from '@/layouts/EmptyLayout.vue'
 
 definePage({
+  name: 'login',
   meta: {
     layout: EmptyLayout,
     title: '로그인',

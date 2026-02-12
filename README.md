@@ -41,9 +41,12 @@ src/
 ├── components/
 │   ├── common/             # 원자 단위 공통 컴포넌트 (BaseButton, BaseInput...)
 │   └── guide/              # (개발 가이드용 컴포넌트 - 배포 시 제외 가능)
-│   └── layouts/            # 페이지 레이아웃 (Default, Empty)
 ├── composables/            # 재사용 가능한 로직
 │   └── queries/            # TanStack Query 훅 모음 (useUserQueries.ts)
+│       └── keys/           # TanStack Query key 모음 (userKeys.ts)
+├── constants/              # 상수
+│   └── routes.ts           # router name 상수 모음
+├── layouts/                # 페이지 레이아웃 (Default, Empty)
 ├── pages/                  # 파일 기반 라우팅 (File-based Routing)
 ├── plugins/                # App Bootstrapping (Pinia, Router, Query 설정 분리)
 ├── stores/                 # Pinia 전역 스토어 (Client State)
@@ -84,33 +87,42 @@ VITE_APP_TITLE=My Vue App
 
 ## 📖 Architecture Guide
 
-이 스타트킷은 **"설정보다는 관례(Convention over Configuration)"**를 따릅니다.
+이 스타트킷은 **"설정보다는 관례(Convention over Configuration)"** 를 따릅니다.
 
 ### 1. API & Data Fetching (3-Layer Pattern)
 
 데이터 흐름을 명확히 하기 위해 API 호출을 3단계로 분리합니다.
 
-**Step 1: API 정의 (`src/api/modules/*.ts`)** `request` 래퍼를 사용하며, 객체(Object) 형태로 export 하여 네임스페이스를 관리합니다.
+**Step 1: API 정의 (`src/api/modules/*.ts`) Named Export(개별 함수)** 형태로 정의하여 불필요한 코드가 번들에 포함되지 않도록 합니다.
 
 ```typescript
 // src/api/modules/user.ts
-export const userApi = {
-  get: () => request<User[]>('/users'),
-  create: (data) => request('/users', { method: 'POST', body: data }),
+export const getUsers = () => {
+  return request<User[]>('/users')
+}
+
+export const createUser = (data) => {
+  return request<User>('/users', {
+    method: 'POST',
+    body: data,
+  })
 }
 ```
 
-**Step 2: Composable 생성 (`src/composables/queries/*.ts`)** TanStack Query 옵션(캐싱, 키 관리)을 여기서 캡슐화합니다.
+**Step 2: Composable 생성 (`src/composables/queries/*.ts`)** **Query Key Factory Pattern**을 적용하여 키를 관리하고, TanStack Query 옵션을 캡슐화합니다.
 
 ```typescript
 // src/composables/queries/useUserQueries.ts
-const QUERY_KEYS = { users: ['users'] }
+const userKeys = {
+  all: ['users'] as const,
+  list: () => [...userKeys.all, 'list'] as const,
+  detail: (id: string) => [...userKeys.all, 'detail', id] as const,
+}
 
 export const useUserListQuery = () => {
   return useQuery({
-    queryKey: QUERY_KEYS.users,
-    queryFn: userApi.get,
-    // staleTime: 1분 (Global Default 적용됨)
+    queryKey: userKeys.list(),
+    queryFn: getUsers,
   })
 }
 ```
@@ -130,9 +142,11 @@ const { data: users, isLoading } = useUserListQuery()
 - **Concurrency Control**: 여러 API가 동시에 401 에러를 맞아도, **토큰 갱신 요청은 딱 한 번만** 실행됩니다. (Promise Locking 패턴 적용)
 - **Auto Logout**: 갱신 실패 시 자동으로 스토어를 초기화하고 로그인 페이지로 이동합니다.
 
-### 3. File-based Routing
+### 3. File-based Routing & Explicit Naming
 
 `src/pages` 폴더 구조가 곧 URL이 됩니다. (`unplugin-vue-router`)
+
+유지보수성을 위해 `definePage` 매크로 내부에 **Route Name을 명시적으로 선언**하는 것을 원칙으로 합니다.
 
 - `pages/index.vue` → `/`
 - `pages/login/index.vue` → `/login`
@@ -143,6 +157,7 @@ const { data: users, isLoading } = useUserListQuery()
 ```typescript
 // src/pages/login/index.vue
 definePage({
+  name: 'login', // ✅ 라우트 이름 고정 (파일 위치가 바뀌어도 안전함)
   meta: {
     layout: DefaultLayout, // 레이아웃 지정 (기본값: Default)
     requiresAuth: false, // 공개 페이지 (기본값: true - Whitelist 방식)
@@ -157,8 +172,8 @@ definePage({
 
 - **Vue**: `ref`, `computed`, `watch`, `onMounted` ...
 - **Router**: `useRouter`, `useRoute`, `definePage`
-- **Validation**: `useForm`, `z` (Zod)
-- **Project**: `./src/api/**`, `./src/composables/**`, `./src/plugins/**`, `./src/stores/**`, `./src/utils/** `,
+- **Validation**: `useForm`, `z`(Zod)
+- **Project**: `./src/composables/**`, `./src/plugins/**`, `./src/stores/**`, `./src/utils/** `,
 
 ---
 
@@ -169,7 +184,7 @@ definePage({
 | **Component File**    | PascalCase | `BaseButton.vue`, `UserProfile.vue` |
 | **Page File**         | kebab-case | `user-profile.vue`, `[id].vue`      |
 | **Composable**        | camelCase  | `useUserQuery.ts`                   |
-| **API Module**        | camelCase  | `userApi`, `authApi`                |
+| **API Module**        | camelCase  | `user.ts`, `auth.ts`                |
 | **Variable/Function** | camelCase  | `handleSubmit`, `isLoading`         |
 | **Interface/Type**    | PascalCase | `User`, `LoginPayload`              |
 

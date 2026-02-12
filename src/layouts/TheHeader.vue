@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { User, Settings, LogOut } from 'lucide-vue-next'
-import type { DropdownItem } from '../common/BaseDropdown.vue'
+import type { DropdownItem } from '@/components/common/BaseDropdown.vue'
 import { toast } from 'vue-sonner'
+import { ROUTE_NAMES } from '@/constants/routes'
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 
 const breadcrumbs = computed(() => {
@@ -33,6 +34,7 @@ const logout = async () => {
   if (!isConfirmed) return
 
   authStore.logout()
+  router.replace({ name: ROUTE_NAMES.LOGIN })
 
   toast.error('로그아웃 되었습니다.')
 }

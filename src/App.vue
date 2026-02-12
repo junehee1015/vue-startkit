@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Toaster } from 'vue-sonner'
 import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
-import DefaultLayout from './components/layouts/DefaultLayout.vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>
 
 <template>
