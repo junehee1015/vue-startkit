@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
 import { User, Settings, LogOut, MoreHorizontal, Bell } from 'lucide-vue-next'
-import { useConfirm } from '@/composables/useConfirm'
 
 // --- 1. Form State ---
 const form = reactive({

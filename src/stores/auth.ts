@@ -1,5 +1,3 @@
-import router from '@/router'
-
 interface User {
   name: string
   email: string
@@ -67,6 +65,7 @@ export const useAuthStore = defineStore(
       accessToken.value = null
       refreshToken.value = null
 
+      await nextTick()
       localStorage.removeItem('auth')
     }
 

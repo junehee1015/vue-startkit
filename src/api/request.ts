@@ -43,8 +43,6 @@ export const request = async <T = unknown>(
     const authStore = useAuthStore()
 
     if (error.response?.status === 401 && !options._retry) {
-      options._retry = true
-
       // 1. 이미 갱신 중이라면? 그 작업이 끝날 때까지 기다림 (대기열)
       if (!refreshPromise) {
         refreshPromise = authStore.refreshAccessToken().finally(() => {
@@ -56,18 +54,15 @@ export const request = async <T = unknown>(
         // 2. 갱신 작업 대기 (첫 번째 요청이 갱신하는 동안 나머지는 여기서 멈춤)
         await refreshPromise
 
-        // 3. 갱신 성공 후, 새 토큰으로 헤더 교체
-        if (authStore.accessToken) {
-          const newHeaders = new Headers(options.headers)
-          newHeaders.set('Authorization', `Bearer ${authStore.accessToken}`)
-          options.headers = newHeaders
-        }
-
-        // 4. 원래 요청 재시도
-        return await _apiInstance<T>(url, options)
+        // 3. 요청 재시도
+        return await _apiInstance<T>(url, { ...options, _retry: true } as FetchOptions<'json'>)
       } catch (refreshError) {
-        router.currentRoute.value.path !== '/login' &&
-          (await router.replace({ name: ROUTE_NAMES.LOGIN }))
+        console.error('Token refresh failed:', refreshError)
+
+        if (router.currentRoute.value.name !== ROUTE_NAMES.LOGIN) {
+          authStore.logout()
+          await router.replace({ name: ROUTE_NAMES.LOGIN })
+        }
         throw refreshError
       }
     }

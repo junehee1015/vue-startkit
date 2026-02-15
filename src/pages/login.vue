@@ -90,9 +90,9 @@ const onSubmit = handleSubmit(async (values) => {
             아이디 기억하기
           </BaseLabel>
         </div>
-        <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">
+        <RouterLink to="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500">
           비밀번호 찾기
-        </a>
+        </RouterLink>
       </div>
 
       <BaseButton type="submit" class="w-full" size="lg" :disabled="isSubmitting">
