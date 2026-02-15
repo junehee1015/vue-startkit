@@ -1,6 +1,5 @@
 import { ofetch } from 'ofetch'
 import type { FetchOptions, FetchError } from 'ofetch'
-import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 import { ROUTE_NAMES } from '@/constants/routes'
 
