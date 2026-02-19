@@ -9,13 +9,11 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const _apiInstance = ofetch.create({
   baseURL: BASE_URL,
   retry: 0,
-
   async onRequest({ options }) {
     const authStore = useAuthStore()
     if (authStore.accessToken) {
-      const headers = new Headers(options.headers)
-      headers.set('Authorization', `Bearer ${authStore.accessToken}`)
-      options.headers = headers
+      options.headers = new Headers(options.headers)
+      options.headers.set('Authorization', `Bearer ${authStore.accessToken}`)
     }
   },
 })
@@ -34,38 +32,50 @@ let refreshPromise: Promise<void> | null = null
 export const request = async <T = unknown>(
   url: string,
   options: FetchOptions<'json'> & { _retry?: boolean } = {},
-) => {
+): Promise<T> => {
   try {
     return await _apiInstance<T>(url, options)
   } catch (e) {
     const error = e as FetchError
     const authStore = useAuthStore()
+    // auth 관련 API는 무한 루프 방지를 위해 토큰 갱신 로직을 타지 않음
+    const isAuthPath = url.includes('/login') || url.includes('/refresh')
 
-    if (error.response?.status === 401 && !options._retry) {
-      // 1. 이미 갱신 중이라면? 그 작업이 끝날 때까지 기다림 (대기열)
+    if (error.response?.status === 401 && !options._retry && !isAuthPath) {
+      // 1. 갱신 작업이 없다면 새로운 갱신 Promise 생성
       if (!refreshPromise) {
         refreshPromise = authStore.refreshAccessToken().finally(() => {
-          refreshPromise = null // 작업 끝나면 초기화
+          refreshPromise = null // 작업 완료 후 초기화 (성공/실패 무관)
         })
       }
 
       try {
-        // 2. 갱신 작업 대기 (첫 번째 요청이 갱신하는 동안 나머지는 여기서 멈춤)
+        // 2. 토큰 갱신 대기
         await refreshPromise
 
-        // 3. 요청 재시도
-        return await _apiInstance<T>(url, { ...options, _retry: true } as FetchOptions<'json'>)
+        // 3. 기존 요청 재시도
+        const retryOptions: FetchOptions<'json'> & { _retry?: boolean } = {
+          ...options,
+          _retry: true,
+        }
+
+        return await _apiInstance<T>(url, retryOptions)
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError)
 
+        // 토큰 갱신 실패 시 스토어의 로그아웃 액션을 호출하여 상태 초기화
+        authStore.logout()
+
+        // 로그인 페이지가 아니라면 튕겨내기
         if (router.currentRoute.value.name !== ROUTE_NAMES.LOGIN) {
-          authStore.logout()
           await router.replace({ name: ROUTE_NAMES.LOGIN })
         }
+
         throw refreshError
       }
     }
 
+    // 401 에러가 아니거나 재시도 실패 시 에러 그대로 던짐
     throw error
   }
 }

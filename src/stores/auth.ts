@@ -3,6 +3,7 @@ interface User {
   email: string
   role: string
 }
+
 export interface LoginPayload {
   email: string
   password: string
@@ -29,7 +30,6 @@ export const useAuthStore = defineStore(
       // 토큰 발급 (실제로는 서버에서 받아옴)
       accessToken.value = 'mock-access-token-' + Date.now()
       refreshToken.value = 'mock-refresh-token-' + Date.now()
-
       user.value = {
         name: 'Juny Jo',
         email: values.email,
@@ -50,9 +50,7 @@ export const useAuthStore = defineStore(
         if (!refreshToken.value) throw new Error('No refresh token')
 
         // 리프레시 토큰을 서버에 보내고 새 엑세스 토큰을 받음
-        const newAccessToken = 'new-access-token-' + Date.now()
-
-        accessToken.value = newAccessToken
+        accessToken.value = 'new-access-token-' + Date.now()
       } catch (error) {
         logout() // 갱신 실패 시 강제 로그아웃
         throw error
