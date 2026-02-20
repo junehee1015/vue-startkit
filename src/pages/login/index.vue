@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import z from 'zod'
 import EmptyLayout from '@/layouts/EmptyLayout.vue'
 
 definePage({

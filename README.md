@@ -40,10 +40,10 @@ src/
 ├── assets/                 # 정적 리소스 (Images, Fonts, CSS)
 ├── components/
 │   ├── common/             # 원자 단위 공통 컴포넌트 (BaseButton, BaseInput...)
-│   └── guide/              # (개발 가이드용 컴포넌트 - 배포 시 제외 가능)
+│   ├── guide/              # (개발 가이드용 컴포넌트 - 배포 시 제외 가능)
+│   └── layouts/            # layouts 공통 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
 ├── composables/            # 재사용 가능한 로직
-│   └── queries/            # TanStack Query 훅 모음 (useUserQueries.ts)
-│       └── keys/           # TanStack Query key 모음 (userKeys.ts)
+│   └── queries/            # TanStack Query, key 훅 모음 (useUserQueries.ts)
 ├── constants/              # 상수
 │   └── routes.ts           # router name 상수 모음
 ├── layouts/                # 페이지 레이아웃 (Default, Empty)
@@ -97,8 +97,10 @@ VITE_APP_TITLE=My Vue App
 
 ```typescript
 // src/api/modules/user.ts
-export const getUsers = () => {
-  return request<User[]>('/users')
+export const fetchUsers = (page: number, status?: string) => {
+  return request<User[]>('/users', {
+    params: { page, status },
+  })
 }
 
 export const createUser = (data) => {
@@ -112,17 +114,34 @@ export const createUser = (data) => {
 **Step 2: Composable 생성 (`src/composables/queries/*.ts`)** **Query Key Factory Pattern**을 적용하여 키를 관리하고, TanStack Query 옵션을 캡슐화합니다.
 
 ```typescript
-// src/composables/queries/useUserQueries.ts
-const userKeys = {
+import { fetchUsers, createUser } from '@/api/modules/users'
+import type { Ref } from 'vue'
+
+// 1. Key Factory Pattern (배열 형태의 확장 가능한 키 구조)
+export const userKeys = {
   all: ['users'] as const,
-  list: () => [...userKeys.all, 'list'] as const,
-  detail: (id: string) => [...userKeys.all, 'detail', id] as const,
+  lists: () => [...userKeys.all, 'list'] as const,
+  list: (page: Ref<number>, status?: Ref<string>) => [...userKeys.lists(), page, status] as const,
 }
 
-export const useUserListQuery = () => {
+// 2. Query Hook (목록 조회)
+export const useUserListQuery = (page: Ref<number>, status?: Ref<string>) => {
   return useQuery({
-    queryKey: userKeys.list(),
-    queryFn: getUsers,
+    queryKey: userKeys.list(page, status), // 반응형 변수가 변경되면 자동 재요청
+    queryFn: () => fetchUsers(page.value, status?.value),
+  })
+}
+
+// 3. Mutation Hook (생성)
+export const useCreateUserMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createUser,
+    onSuccess: () => {
+      // 생성 성공 시, 캐시를 무효화하여 목록 화면을 최신화합니다.
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() })
+    },
   })
 }
 ```
@@ -130,8 +149,48 @@ export const useUserListQuery = () => {
 **Step 3: 컴포넌트 사용 (`src/pages/*.vue`)** 컴포넌트는 비즈니스 로직 없이 데이터 바인딩에만 집중합니다.
 
 ```typescript
-// src/pages/users/index.vue
-const { data: users, isLoading } = useUserListQuery()
+// src/components/UserList.vue - Children
+<script setup lang="ts">
+import { useUserListQuery } from '@/composables/queries/useUserQueries'
+
+const page = ref(1)
+
+// 🚨 v-if="isLoading" 대신, 반환된 suspense() 함수를 await 합니다!
+// 이를 통해 컴포넌트가 일시 정지(Suspend) 되며 부모에게 로딩 제어권이 넘어갑니다.
+const { data: users, suspense } = useUserListQuery(page)
+await suspense()
+</script>
+
+<template>
+  <!-- 안전하게 데이터를 즉시 그립니다. (isLoading 체킹 불필요) -->
+  <ul>
+    <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+  </ul>
+</template>
+```
+
+```typescript
+// src/pages/users/index.vue - Parent
+<script setup lang="ts">
+import UserList from '@/components/UserList.vue'
+</script>
+
+<template>
+  <div>
+    <h1>사용자 목록 관리</h1>
+
+    <!-- 비동기 컴포넌트의 로딩 상태를 여기서 일괄 제어합니다. -->
+    <Suspense>
+      <template #default>
+        <UserList />
+      </template>
+
+      <template #fallback>
+        <div class="animate-pulse bg-gray-200 h-32 rounded">데이터를 불러오는 중...</div>
+      </template>
+    </Suspense>
+  </div>
+</template>
 ```
 
 ### 2. Authentication (Token Refresh)
@@ -172,8 +231,9 @@ definePage({
 
 - **Vue**: `ref`, `computed`, `watch`, `onMounted` ...
 - **Router**: `useRouter`, `useRoute`, `definePage`
-- **Validation**: `useForm`, `z`(Zod)
-- **Project**: `./src/composables/**`, `./src/plugins/**`, `./src/stores/**`, `./src/utils/** `,
+- **Fetching**: `useQuery`, `useMutation`, `useQueryClient`
+- **Validation**: `useForm`
+- **Project**: `./src/composables`, `./src/stores`
 
 ---
 

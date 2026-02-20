@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cn } from '@/utils/cn'
 import { BookOpen, Box, LayoutDashboard } from 'lucide-vue-next'
 
 const menuItems = [

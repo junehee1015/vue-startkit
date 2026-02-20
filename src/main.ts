@@ -4,6 +4,7 @@ import router from '@/router'
 
 import '@/assets/css/main.css'
 import 'vue-sonner/style.css'
+import { registerPlugins } from './plugins'
 
 const initApp = async () => {
   const app = createApp(App)

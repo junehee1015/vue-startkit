@@ -1,1 +1,1 @@
-도메인 별 TanStack Query 훅 모음 (useUserQueries.ts)
+도메인 별 TanStack Query, key 모음 (useUserQueries.ts)

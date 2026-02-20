@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+import { cn } from '@/utils/cn'
 import { Inbox } from 'lucide-vue-next'
 
 export interface Column {

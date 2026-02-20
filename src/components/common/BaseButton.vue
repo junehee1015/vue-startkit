@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cn } from '@/utils/cn'
 import { Loader2 } from 'lucide-vue-next'
 
 interface Props {

@@ -12,6 +12,7 @@ import {
   SelectIcon,
 } from 'radix-vue'
 import { ChevronDown, Check } from 'lucide-vue-next'
+import { cn } from '@/utils/cn'
 
 export interface SelectOption {
   label: string

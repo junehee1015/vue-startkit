@@ -12,7 +12,7 @@ const tabs = [
   { label: '공통 컴포넌트', value: 'common' },
 ]
 
-const currentTab = ref('api') // BaseTabs의 v-model과 연결
+const currentTab = ref('api')
 </script>
 
 <template>

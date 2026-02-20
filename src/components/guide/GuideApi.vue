@@ -1,13 +1,14 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="space-y-12 max-w-5xl">
+  <div class="space-y-12 max-w-5xl pb-32">
     <div>
-      <h2 class="text-2xl font-bold text-gray-900">API & Data Fetching</h2>
+      <h2 class="text-2xl font-bold text-gray-900">API & Data Fetching 아키텍처</h2>
       <p class="mt-2 text-gray-600">
         본 스타트킷은 <strong>Ofetch</strong>와 <strong>TanStack Query</strong>가 최적의 상태로
         설정되어 있습니다.<br />
-        전역 설정을 통해 중복 코드를 최소화하고 일관성 있는 데이터 관리를 수행합니다.
+        <strong>Key Factory Pattern</strong>을 통해 캐시 키를 안전하게 관리하고 의존성을
+        최소화합니다.
       </p>
     </div>
 
@@ -26,7 +27,7 @@
           <p class="text-sm text-blue-700">
             <strong>Auto Import 알림:</strong><br />
             아래 예시 코드에는 <code>import</code> 구문이 생략되어 있습니다. <br />
-            <code>ref</code>, <code>useQuery</code>, <code>request</code> 등은 설정에 의해 자동으로
+            <code>ref</code>, <code>useQuery</code> 등 라이브러리 코어 함수는 설정에 의해 자동으로
             주입됩니다.
           </p>
         </div>
@@ -41,38 +42,36 @@
         <h3 class="text-xl font-bold text-gray-800">API 함수 정의 (Api Layer)</h3>
       </div>
       <p class="text-gray-600 text-sm">
-        <code>src/api/modules</code> 폴더에 도메인별로 파일을 생성합니다.
+        <code>src/api/modules</code> 폴더에 도메인별 통신 함수를 만듭니다. 파라미터(Params/Query)를
+        명시적으로 전달합니다.
       </p>
 
-      <div class="bg-[#1e1e1e] rounded-lg overflow-hidden shadow-xl border border-gray-800">
-        <div
-          class="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-gray-800"
-        >
-          <div class="flex gap-1.5">
+      <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
+        <div class="flex items-center px-4 py-2 bg-[#252526] border-b border-gray-800">
+          <div class="flex gap-1.5 mr-4">
             <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
             <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
             <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
           </div>
-          <span class="text-xs text-gray-400 font-mono">src/api/modules/user.ts</span>
-          <div class="w-10"></div>
+          <span class="text-gray-400">src/api/modules/users.ts</span>
         </div>
-        <div class="p-4 overflow-x-auto">
-          <pre
-            v-pre
-            class="text-sm font-mono leading-relaxed text-gray-300"
-          ><code><span class="text-gray-500">// Named Exports를 사용하여 불필요한 코드가 번들에 포함되지 않도록 합니다.</span>
+        <pre
+          class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
+        ><code><span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">request</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/api/request'</span>
 
-<span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">getUsers</span> = <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
-  <span class="text-purple-400">return</span> <span class="text-yellow-200">request</span>&lt;<span class="text-emerald-300">User[]</span>&gt;(<span class="text-orange-300">'/users'</span>)
+<span class="text-[#6a9955]">// 파라미터를 받아 params 객체로 전달합니다 (URL 인코딩 자동 처리)</span>
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">fetchUsers</span> = (<span class="text-[#9cdcfe]">page</span>: <span class="text-[#4ec9b0]">number</span>, <span class="text-[#9cdcfe]">status</span>?: <span class="text-[#4ec9b0]">string</span>) <span class="text-[#569cd6]">=&gt;</span> {
+  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">request</span>&lt;<span class="text-[#4ec9b0]">User</span>[]&gt;(<span class="text-[#ce9178]">'/users'</span>, {
+    <span class="text-[#9cdcfe]">params</span>: { <span class="text-[#9cdcfe]">page</span>, <span class="text-[#9cdcfe]">status</span> }
+  })
 }
 
-<span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">createUser</span> = <span class="text-yellow-400">(</span><span class="text-blue-300">data</span><span class="text-yellow-400">)</span> <span class="text-blue-400">=></span> {
-  <span class="text-purple-400">return</span> <span class="text-yellow-200">request</span>&lt;<span class="text-emerald-300">User</span>&gt;(<span class="text-orange-300">'/users'</span>, {
-    method: <span class="text-orange-300">'POST'</span>,
-    body: <span class="text-blue-300">data</span>
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">createUser</span> = (<span class="text-[#9cdcfe]">data</span>: <span class="text-[#4ec9b0]">Partial</span>&lt;<span class="text-[#4ec9b0]">User</span>&gt;) <span class="text-[#569cd6]">=&gt;</span> {
+  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">request</span>&lt;<span class="text-[#4ec9b0]">User</span>&gt;(<span class="text-[#ce9178]">'/users'</span>, {
+    <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
+    <span class="text-[#9cdcfe]">data</span>
   })
 }</code></pre>
-        </div>
       </div>
     </section>
 
@@ -81,53 +80,56 @@
         <span class="bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded text-sm"
           >STEP 2</span
         >
-        <h3 class="text-xl font-bold text-gray-800">Composable 생성 (Query Layer)</h3>
+        <h3 class="text-xl font-bold text-gray-800">
+          Query Hook & Key Factory (src/composables/queries)
+        </h3>
       </div>
       <p class="text-gray-600 text-sm">
-        API 호출을 감싸는 Custom Hook을 만듭니다. <code>queryKey</code>를 한곳에서 관리하는 것이
-        좋습니다.
+        API 호출을 감싸는 Custom Hook을 만듭니다. <strong>Key Factory Pattern</strong>을 적용하여
+        캐시 키를 안전하게 관리합니다.
       </p>
 
-      <div class="bg-[#1e1e1e] rounded-lg overflow-hidden shadow-xl border border-gray-800">
-        <div
-          class="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-gray-800"
-        >
-          <div class="flex gap-1.5">
+      <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
+        <div class="flex items-center px-4 py-2 bg-[#252526] border-b border-gray-800">
+          <div class="flex gap-1.5 mr-4">
             <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
             <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
             <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
           </div>
-          <span class="text-xs text-gray-400 font-mono">src/composables/useUserQueries.ts</span>
-          <div class="w-10"></div>
+          <span class="text-gray-400">src/composables/queries/useUserQueries.ts</span>
         </div>
-        <div class="p-4 overflow-x-auto">
-          <pre
-            v-pre
-            class="text-sm font-mono leading-relaxed text-gray-300"
-          ><code><span class="text-blue-400">const</span> <span class="text-blue-300">QUERY_KEYS</span> = { users: [<span class="text-orange-300">'users'</span>] }
+        <pre
+          class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
+        ><code><span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">fetchUsers</span>, <span class="text-[#9cdcfe]">createUser</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/api/modules/users'</span>
+<span class="text-[#c586c0]">import</span> <span class="text-[#569cd6]">type</span> { <span class="text-[#4ec9b0]">Ref</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'vue'</span>
 
-<span class="text-gray-500">// 1. 목록 조회 (전역 설정 사용 -> 옵션 생략 가능)</span>
-<span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">useUserListQuery</span> = <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
-  <span class="text-purple-400">return</span> <span class="text-yellow-200">useQuery</span>({
-    queryKey: <span class="text-blue-300">QUERY_KEYS</span>.users,
-    queryFn: <span class="text-blue-300">getUsers </span>,
-    <span class="text-gray-500">// staleTime: 60000 (Global Default 적용됨)</span>
+<span class="text-[#6a9955]">// 1. Key Factory Pattern (배열 형태의 확장 가능한 키 구조)</span>
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">userKeys</span> = {
+  <span class="text-[#9cdcfe]">all</span>: [<span class="text-[#ce9178]">'users'</span>] <span class="text-[#569cd6]">as const</span>,
+  <span class="text-[#dcdcaa]">lists</span>: () <span class="text-[#569cd6]">=&gt;</span> [...<span class="text-[#4fc1ff]">userKeys</span>.<span class="text-[#9cdcfe]">all</span>, <span class="text-[#ce9178]">'list'</span>] <span class="text-[#569cd6]">as const</span>,
+  <span class="text-[#dcdcaa]">list</span>: (<span class="text-[#9cdcfe]">page</span>: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">number</span>&gt;, <span class="text-[#9cdcfe]">status</span>?: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">string</span>&gt;) <span class="text-[#569cd6]">=&gt;</span> [...<span class="text-[#4fc1ff]">userKeys</span>.<span class="text-[#dcdcaa]">lists</span>(), <span class="text-[#9cdcfe]">page</span>, <span class="text-[#9cdcfe]">status</span>] <span class="text-[#569cd6]">as const</span>,
+}
+
+<span class="text-[#6a9955]">// 2. Query Hook (목록 조회)</span>
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">useUserListQuery</span> = (<span class="text-[#9cdcfe]">page</span>: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">number</span>&gt;, <span class="text-[#9cdcfe]">status</span>?: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">string</span>&gt;) <span class="text-[#569cd6]">=&gt;</span> {
+  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">useQuery</span>({
+    <span class="text-[#9cdcfe]">queryKey</span>: <span class="text-[#4fc1ff]">userKeys</span>.<span class="text-[#dcdcaa]">list</span>(<span class="text-[#9cdcfe]">page</span>, <span class="text-[#9cdcfe]">status</span>), <span class="text-[#6a9955]">// 반응형 변수가 변경되면 자동 재요청</span>
+    <span class="text-[#dcdcaa]">queryFn</span>: () <span class="text-[#569cd6]">=&gt;</span> <span class="text-[#dcdcaa]">fetchUsers</span>(<span class="text-[#9cdcfe]">page</span>.value, <span class="text-[#9cdcfe]">status</span>?.value),
   })
 }
 
-<span class="text-gray-500">// 2. 생성 (Mutation)</span>
-<span class="text-purple-400">export</span> <span class="text-blue-400">const</span> <span class="text-yellow-200">useCreateUserMutation</span> = <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
-  <span class="text-blue-400">const</span> <span class="text-blue-300">queryClient</span> = <span class="text-yellow-200">useQueryClient</span>()
+<span class="text-[#6a9955]">// 3. Mutation Hook (생성)</span>
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">useCreateUserMutation</span> = () <span class="text-[#569cd6]">=&gt;</span> {
+  <span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">queryClient</span> = <span class="text-[#dcdcaa]">useQueryClient</span>()
   
-  <span class="text-purple-400">return</span> <span class="text-yellow-200">useMutation</span>({
-    mutationFn: <span class="text-blue-300">createUser</span>,
-    <span class="text-yellow-200">onSuccess</span>: <span class="text-yellow-400">()</span> <span class="text-blue-400">=></span> {
-      <span class="text-gray-500">// 목록 갱신</span>
-      <span class="text-blue-300">queryClient</span>.<span class="text-yellow-200">invalidateQueries</span>({ queryKey: <span class="text-blue-300">QUERY_KEYS</span>.users })
+  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">useMutation</span>({
+    <span class="text-[#9cdcfe]">mutationFn</span>: <span class="text-[#dcdcaa]">createUser</span>,
+    <span class="text-[#dcdcaa]">onSuccess</span>: () <span class="text-[#569cd6]">=&gt;</span> {
+      <span class="text-[#6a9955]">// 생성 성공 시, 캐시를 무효화하여 목록 화면을 최신화합니다.</span>
+      <span class="text-[#4fc1ff]">queryClient</span>.<span class="text-[#dcdcaa]">invalidateQueries</span>({ <span class="text-[#9cdcfe]">queryKey</span>: <span class="text-[#4fc1ff]">userKeys</span>.<span class="text-[#dcdcaa]">lists</span>() })
     }
   })
 }</code></pre>
-        </div>
       </div>
     </section>
 
@@ -136,38 +138,68 @@
         <span class="bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded text-sm"
           >STEP 3</span
         >
-        <h3 class="text-xl font-bold text-gray-800">컴포넌트 사용 (View Layer)</h3>
+        <h3 class="text-xl font-bold text-gray-800">컴포넌트 사용 (Suspense & View Layer)</h3>
       </div>
       <p class="text-gray-600 text-sm">
-        컴포넌트에서는 데이터의 출처나 캐싱 로직을 알 필요 없이, 데이터만 받아와서 그립니다.
+        부모 컴포넌트에서 <code>&lt;Suspense&gt;</code>를 통해 로딩을 일괄 제어하고, 자식은
+        <code>await suspense()</code>를 호출하여 데이터를 즉시 그립니다.
       </p>
 
-      <div class="bg-[#1e1e1e] rounded-lg overflow-hidden shadow-xl border border-gray-800">
-        <div
-          class="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-gray-800"
-        >
-          <div class="flex gap-1.5">
-            <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-            <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-            <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+      <div class="grid grid-cols-1 gap-6">
+        <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
+          <div class="flex items-center px-4 py-2 bg-[#252526] border-b border-gray-800">
+            <span class="text-gray-400 font-bold">Child Component</span>
+            <span class="text-gray-500 ml-2">| src/components/UserList.vue</span>
           </div>
-          <span class="text-xs text-gray-400 font-mono">src/pages/users/index.vue</span>
-          <div class="w-10"></div>
-        </div>
-        <div class="p-4 overflow-x-auto">
           <pre
             v-pre
-            class="text-sm font-mono leading-relaxed text-gray-300"
-          ><code><span class="text-blue-400">const</span> { <span class="text-blue-300">data</span>: <span class="text-blue-300">users</span>, <span class="text-blue-300">isLoading</span> } = <span class="text-yellow-200">useUserListQuery</span>()
+            class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
+          ><code><span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">script</span> <span class="text-[#9cdcfe]">setup</span> <span class="text-[#9cdcfe]">lang</span>=<span class="text-[#ce9178]">"ts"</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">useUserListQuery</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/composables/queries/useUserQueries'</span>
 
-&lt;<span class="text-blue-400">template</span>&gt;
-  &lt;<span class="text-emerald-300">div</span> <span class="text-purple-400">v-if</span>=<span class="text-orange-300">"isLoading"</span>&gt;Loading...&lt;/<span class="text-emerald-300">div</span>&gt;
-  &lt;<span class="text-emerald-300">ul</span> <span class="text-purple-400">v-else</span>&gt;
-    &lt;<span class="text-emerald-300">li</span> <span class="text-purple-400">v-for</span>=<span class="text-orange-300">"user in users"</span> <span class="text-blue-400">:key</span>=<span class="text-orange-300">"user.id"</span>&gt;
-      {{ user.name }}
-    &lt;/<span class="text-emerald-300">li</span>&gt;
-  &lt;/<span class="text-emerald-300">ul</span>&gt;
-&lt;/<span class="text-blue-400">template</span>&gt;</code></pre>
+<span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">page</span> = <span class="text-[#dcdcaa]">ref</span>(<span class="text-[#b5cea8]">1</span>)
+
+<span class="text-[#6a9955]">// 🚨 v-if="isLoading" 대신, 반환된 suspense() 함수를 await 합니다!</span>
+<span class="text-[#6a9955]">// 이를 통해 컴포넌트가 일시 정지(Suspend) 되며 부모에게 로딩 제어권이 넘어갑니다.</span>
+<span class="text-[#569cd6]">const</span> { <span class="text-[#9cdcfe]">data</span>: <span class="text-[#4fc1ff]">users</span>, <span class="text-[#4fc1ff]">suspense</span> } = <span class="text-[#dcdcaa]">useUserListQuery</span>(<span class="text-[#4fc1ff]">page</span>)
+<span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">suspense</span>()
+<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">script</span><span class="text-[#808080]">&gt;</span>
+
+<span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#6a9955]">&lt;!-- 안전하게 데이터를 즉시 그립니다. (isLoading 체킹 불필요) --&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">ul</span><span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">li</span> <span class="text-[#9cdcfe]">v-for</span>=<span class="text-[#ce9178]">"user in users"</span> <span class="text-[#9cdcfe]">:key</span>=<span class="text-[#ce9178]">"user.id"</span><span class="text-[#808080]">&gt;</span>{{ user.name }}<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">li</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">ul</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span></code></pre>
+        </div>
+
+        <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
+          <div class="flex items-center px-4 py-2 bg-[#252526] border-b border-gray-800">
+            <span class="text-gray-400 font-bold">Parent Page</span>
+            <span class="text-gray-500 ml-2">| src/pages/users/index.vue</span>
+          </div>
+          <pre
+            class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
+          ><code><span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">script</span> <span class="text-[#9cdcfe]">setup</span> <span class="text-[#9cdcfe]">lang</span>=<span class="text-[#ce9178]">"ts"</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#c586c0]">import</span> <span class="text-[#9cdcfe]">UserList</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/components/UserList.vue'</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">script</span><span class="text-[#808080]">&gt;</span>
+
+<span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">h1</span><span class="text-[#808080]">&gt;</span>사용자 목록 관리<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">h1</span><span class="text-[#808080]">&gt;</span>
+    
+    <span class="text-[#6a9955]">&lt;!-- 비동기 컴포넌트의 로딩 상태를 여기서 일괄 제어합니다. --&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">Suspense</span><span class="text-[#808080]">&gt;</span>
+      <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#default</span><span class="text-[#808080]">&gt;</span>
+        <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">UserList</span> <span class="text-[#808080]">/&gt;</span>
+      <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+
+      <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#fallback</span><span class="text-[#808080]">&gt;</span>
+        <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">div</span> <span class="text-[#9cdcfe]">class</span>=<span class="text-[#ce9178]">"animate-pulse bg-gray-200 h-32 rounded"</span><span class="text-[#808080]">&gt;</span>데이터를 불러오는 중...<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span>
+      <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">Suspense</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span></code></pre>
         </div>
       </div>
     </section>

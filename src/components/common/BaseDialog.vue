@@ -10,6 +10,7 @@ import {
   DialogClose,
 } from 'radix-vue'
 import { X } from 'lucide-vue-next'
+import { cn } from '@/utils/cn'
 
 interface Props {
   title?: string

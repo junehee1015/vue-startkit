@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cn } from '@/utils/cn'
 import { ChevronRight, Home } from 'lucide-vue-next'
 
 export interface BreadcrumbItem {
