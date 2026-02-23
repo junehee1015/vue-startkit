@@ -99,7 +99,7 @@ VITE_APP_TITLE=My Vue App
 // src/api/modules/user.ts
 export const fetchUsers = (page: number, status?: string) => {
   return request<User[]>('/users', {
-    params: { page, status },
+    query: { page, status },
   })
 }
 
@@ -142,6 +142,10 @@ export const useCreateUserMutation = () => {
       // 생성 성공 시, 캐시를 무효화하여 목록 화면을 최신화합니다.
       queryClient.invalidateQueries({ queryKey: userKeys.lists() })
     },
+    onError: (error) => {
+      // 에러 처리
+      console.error('유저 생성 실패:', error)
+    },
   })
 }
 ```
@@ -155,15 +159,26 @@ import { useUserListQuery } from '@/composables/queries/useUserQueries'
 
 const page = ref(1)
 
-// 🚨 v-if="isLoading" 대신, 반환된 suspense() 함수를 await 합니다!
+// v-if="isLoading" 대신, 반환된 suspense() 함수를 await 합니다!
 // 이를 통해 컴포넌트가 일시 정지(Suspend) 되며 부모에게 로딩 제어권이 넘어갑니다.
-const { data: users, suspense } = useUserListQuery(page)
-await suspense()
+// 에러 처리를 위해 isError와 error 객체도 함께 가져옵니다.
+const { data: users, suspense, isError, error } = useUserListQuery(page)
+
+// [Component 에러 처리] 에러 발생 시 UI를 제어하기 위해 try-catch로 감쌉니다.
+try {
+  await suspense()
+} catch (err) {
+  console.error('컴포넌트 단 UI 에러 처리 수행')
+}
 </script>
 
 <template>
+  <!-- 에러 발생 시 보여줄 컴포넌트 UI 방어 코드 -->
+  <div v-if="isError" class="text-red-500">
+    에러가 발생했습니다: {{ error?.message }}
+  </div>
   <!-- 안전하게 데이터를 즉시 그립니다. (isLoading 체킹 불필요) -->
-  <ul>
+  <ul v-else>
     <li v-for="user in users" :key="user.id">{{ user.name }}</li>
   </ul>
 </template>
