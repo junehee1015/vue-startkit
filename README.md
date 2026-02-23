@@ -103,10 +103,10 @@ export const fetchUsers = (page: number, status?: string) => {
   })
 }
 
-export const createUser = (data) => {
+export const createUser = (body) => {
   return request<User>('/users', {
     method: 'POST',
-    body: data,
+    body,
   })
 }
 ```
