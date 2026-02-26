@@ -1,7 +1,5 @@
 import { ofetch } from 'ofetch'
 import type { FetchOptions, FetchError } from 'ofetch'
-import router from '@/router'
-import { ROUTE_NAMES } from '@/constants/routes'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -67,8 +65,8 @@ export const request = async <T = unknown>(
         authStore.logout()
 
         // 로그인 페이지가 아니라면 튕겨내기
-        if (router.currentRoute.value.name !== ROUTE_NAMES.LOGIN) {
-          await router.replace({ name: ROUTE_NAMES.LOGIN })
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login'
         }
 
         throw refreshError
