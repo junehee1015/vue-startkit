@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TabsRoot, TabsList, TabsTrigger, TabsContent } from 'radix-vue'
+import { TabsRoot, TabsList, TabsTrigger, TabsContent } from 'reka-ui'
 import { cn } from '@/utils/cn'
 
 interface TabItem {

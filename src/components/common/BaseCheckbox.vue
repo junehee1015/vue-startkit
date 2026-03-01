@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckboxRoot, CheckboxIndicator } from 'radix-vue'
+import { CheckboxRoot, CheckboxIndicator } from 'reka-ui'
 import { Check } from 'lucide-vue-next'
 import { cn } from '@/utils/cn'
 

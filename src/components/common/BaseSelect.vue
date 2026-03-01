@@ -10,7 +10,7 @@ import {
   SelectItemText,
   SelectItemIndicator,
   SelectIcon,
-} from 'radix-vue'
+} from 'reka-ui'
 import { ChevronDown, Check } from 'lucide-vue-next'
 import { cn } from '@/utils/cn'
 

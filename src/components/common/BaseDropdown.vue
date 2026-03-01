@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuGroup,
-} from 'radix-vue'
+} from 'reka-ui'
 
 export interface DropdownItem {
   label?: string

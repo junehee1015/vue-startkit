@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/utils/cn'
-import { Label } from 'radix-vue'
+import { Label } from 'reka-ui'
 
 interface Props {
   class?: string

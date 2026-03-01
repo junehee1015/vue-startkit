@@ -6,7 +6,7 @@ import {
   PaginationPrev,
   PaginationNext,
   PaginationEllipsis,
-} from 'radix-vue'
+} from 'reka-ui'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-vue-next'
 import { cn } from '@/utils/cn'
 

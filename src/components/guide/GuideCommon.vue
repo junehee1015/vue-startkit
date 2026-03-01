@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { User, Settings, LogOut, MoreHorizontal, Bell } from 'lucide-vue-next'
+import dayjs from 'dayjs'
 
 // --- 1. Form State ---
 const form = reactive({
@@ -17,6 +18,9 @@ const roleOptions = [
   { label: '일반 사용자 (User)', value: 'user' },
   { label: '게스트 (Guest)', value: 'guest', disabled: true },
 ]
+
+// Datepicker State
+const dateValue = ref(dayjs().format('YYYY-MM-DD'))
 
 // --- 2. Dialog State ---
 const isDialogOpen = ref(false)
@@ -58,12 +62,47 @@ const dropdownItems = [
   { label: '로그아웃', icon: LogOut, danger: true, onClick: () => alert('Logout') },
 ]
 
-// --- 6. Tabs Demo ---
+// --- 6. Layout Demo (Tabs & Accordion) ---
 const tabItems = [
   { label: '계정 설정', value: 'account' },
   { label: '비밀번호 변경', value: 'password' },
 ]
 const currentTabDemo = ref('account')
+
+const accordionItems = [
+  {
+    value: 'item-1',
+    title: 'Startkit의 장점은 무엇인가요?',
+    content: 'Vue 3, Reka UI, Tailwind CSS를 활용해 빠르고 일관된 개발이 가능합니다.',
+  },
+  {
+    value: 'item-2',
+    title: '디자인 시스템 커스텀이 가능한가요?',
+    content: '네, 모든 Base 컴포넌트는 cn 유틸리티를 통해 쉽게 스타일을 덮어쓸 수 있습니다.',
+  },
+]
+const accordionValue = ref('item-1')
+
+// --- 7. Pagination State ---
+const paginationPage = ref(1)
+
+// --- 8. Toast Demo ---
+const handleToast = (type: 'default' | 'success' | 'error' | 'action') => {
+  if (type === 'default') {
+    toast('기본 토스트 알림입니다.')
+  } else if (type === 'success') {
+    toast.success('성공적으로 저장되었습니다.')
+  } else if (type === 'error') {
+    toast.error('요청 처리 중 오류가 발생했습니다.')
+  } else if (type === 'action') {
+    toast('데이터가 삭제되었습니다.', {
+      action: {
+        label: '실행 취소',
+        onClick: () => alert('실행이 취소되었습니다.'),
+      },
+    })
+  }
+}
 
 // --- Utils: Scroll ---
 const scrollTo = (id: string) => {
@@ -110,25 +149,26 @@ const scrollTo = (id: string) => {
             </div>
           </div>
 
-          <div class="bg-gray-900 rounded-xl overflow-hidden text-sm shadow-lg">
+          <div class="bg-[#1e1e1e] rounded-xl overflow-hidden text-sm shadow-lg">
             <div
-              class="px-4 py-2 bg-gray-800 border-b border-gray-700 text-gray-400 text-xs font-mono"
+              class="px-4 py-2 bg-[#2d2d2d] border-b border-[#3c3c3c] text-[#cccccc] text-xs font-mono"
             >
               Usage
             </div>
             <pre
-              class="p-4 overflow-x-auto text-gray-300 font-mono leading-relaxed"
-            ><code>&lt;!-- Variants --&gt;
-&lt;BaseButton&gt;저장&lt;/BaseButton&gt;
-&lt;BaseButton <span class="text-blue-400">variant</span>="outline"&gt;취소&lt;/BaseButton&gt;
-&lt;BaseButton <span class="text-red-400">variant</span>="danger"&gt;삭제&lt;/BaseButton&gt;
+              v-pre
+              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+            ><code><span class="text-[#6a9955]">&lt;!-- Variants --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;저장&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">variant</span>=<span class="text-[#ce9178]">"outline"</span>&gt;취소&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">variant</span>=<span class="text-[#ce9178]">"danger"</span>&gt;삭제&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
 
-&lt;!-- States --&gt;
-&lt;BaseButton <span class="text-purple-400">loading</span>&gt;로딩 중...&lt;/BaseButton&gt;
-&lt;BaseButton <span class="text-purple-400">disabled</span>&gt;비활성화&lt;/BaseButton&gt;
+<span class="text-[#6a9955]">&lt;!-- States --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">loading</span>&gt;로딩 중...&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">disabled</span>&gt;비활성화&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
 
-&lt;!-- As Link (Router) --&gt;
-&lt;BaseButton <span class="text-green-400">to</span>="/login"&gt;로그인으로 이동&lt;/BaseButton&gt;</code></pre>
+<span class="text-[#6a9955]">&lt;!-- As Link (Router) --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">to</span>=<span class="text-[#ce9178]">"/login"</span>&gt;로그인으로 이동&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;</code></pre>
           </div>
         </div>
       </section>
@@ -169,42 +209,45 @@ const scrollTo = (id: string) => {
                 >
               </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 mt-6 border-t border-gray-100">
+              <BaseFormField label="날짜 선택">
+                <BaseDatepicker v-model="dateValue" />
+              </BaseFormField>
+            </div>
           </div>
 
-          <div class="bg-gray-900 rounded-xl overflow-hidden text-sm shadow-lg h-fit">
+          <div class="bg-[#1e1e1e] rounded-xl overflow-hidden text-sm shadow-lg h-fit">
             <div
-              class="px-4 py-2 bg-gray-800 border-b border-gray-700 text-gray-400 text-xs font-mono"
+              class="px-4 py-2 bg-[#2d2d2d] border-b border-[#3c3c3c] text-[#cccccc] text-xs font-mono"
             >
               Usage
             </div>
             <pre
-              class="p-4 overflow-x-auto text-gray-300 font-mono leading-relaxed"
-            ><code>&lt;!-- 1. Input Group --&gt;
-&lt;BaseFormField 
-  <span class="text-blue-400">label</span>="Email" 
-  <span class="text-blue-400">required</span> 
-  <span class="text-blue-400">error-message</span>="error"
+              v-pre
+              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+            ><code><span class="text-[#6a9955]">&lt;!-- 1. Input Group --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseFormField</span> 
+  <span class="text-[#9cdcfe]">label</span>=<span class="text-[#ce9178]">"Email"</span> 
+  <span class="text-[#9cdcfe]">required</span> 
+  <span class="text-[#9cdcfe]">error-message</span>=<span class="text-[#ce9178]">"error"</span>
 &gt;
-  &lt;BaseInput <span class="text-green-400">v-model</span>="form.email" /&gt;
-&lt;/BaseFormField&gt;
+  &lt;<span class="text-[#4ec9b0]">BaseInput</span> <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"form.email"</span> /&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseFormField</span>&gt;
 
-&lt;!-- 2. Select --&gt;
-&lt;BaseSelect 
-  <span class="text-green-400">v-model</span>="form.role" 
-  <span class="text-purple-400">:options</span>="[
+<span class="text-[#6a9955]">&lt;!-- 2. Select --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseSelect</span> 
+  <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"form.role"</span> 
+  <span class="text-[#9cdcfe]">:options</span>=<span class="text-[#ce9178]">"[
     { label: 'Admin', value: 'admin' },
     { label: 'User', value: 'user' }
-  ]" 
+  ]"</span> 
 /&gt;
 
-&lt;!-- 3. Checkbox & Switch --&gt;
-&lt;div class="flex items-center gap-2"&gt;
-  &lt;BaseSwitch 
-    <span class="text-blue-400">id</span>="marketing" 
-    <span class="text-green-400">v-model:checked</span>="form.marketing" 
-  /&gt;
-  &lt;BaseLabel <span class="text-blue-400">for</span>="marketing"&gt;수신 동의&lt;/BaseLabel&gt;
-&lt;/div&gt;</code></pre>
+<span class="text-[#6a9955]">&lt;!-- 3. Datepicker --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseFormField</span> <span class="text-[#9cdcfe]">label</span>=<span class="text-[#ce9178]">"날짜 선택"</span>&gt;
+  &lt;<span class="text-[#4ec9b0]">BaseDatepicker</span> <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"dateValue"</span> /&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseFormField</span>&gt;</code></pre>
           </div>
         </div>
       </section>
@@ -236,36 +279,48 @@ const scrollTo = (id: string) => {
                 <div class="p-4 text-gray-500">비밀번호 탭 내용...</div>
               </template>
             </BaseTabs>
+
+            <div class="space-y-4 pt-6 mt-6 border-t border-gray-100">
+              <h4 class="font-bold text-sm">Accordion</h4>
+              <BaseAccordion v-model="accordionValue" :items="accordionItems">
+                <template #content-item-2="{ item }">
+                  <div class="bg-blue-50 p-3 rounded text-blue-800">
+                    {{ item.content }} <br />
+                    <span class="text-xs font-semibold mt-1 inline-block">* 슬롯 커스텀 예시</span>
+                  </div>
+                </template>
+              </BaseAccordion>
+            </div>
           </div>
 
-          <div class="bg-gray-900 rounded-xl overflow-hidden text-sm shadow-lg h-fit">
+          <div class="bg-[#1e1e1e] rounded-xl overflow-hidden text-sm shadow-lg h-fit">
             <div
-              class="px-4 py-2 bg-gray-800 border-b border-gray-700 text-gray-400 text-xs font-mono"
+              class="px-4 py-2 bg-[#2d2d2d] border-b border-[#3c3c3c] text-[#cccccc] text-xs font-mono"
             >
               Usage
             </div>
             <pre
-              class="p-4 overflow-x-auto text-gray-300 font-mono leading-relaxed"
-            ><code>&lt;!-- Tabs --&gt;
-&lt;BaseTabs <span class="text-green-400">v-model</span>="currentTab" <span class="text-purple-400">:items</span>="items"&gt;
-  
-  <span class="text-gray-500">&lt;!-- 슬롯 이름: content-{value} --&gt;</span>
-  &lt;template <span class="text-blue-400">#content-account</span>&gt;
-    
-    &lt;!-- Card --&gt;
-    &lt;BaseCard 
-      <span class="text-blue-400">title</span>="계정 정보" 
-      <span class="text-blue-400">description</span>="..."
-    &gt;
-      &lt;div&gt;Content...&lt;/div&gt;
-      
-      &lt;template <span class="text-blue-400">#footer</span>&gt;
-        &lt;BaseButton&gt;Save&lt;/BaseButton&gt;
-      &lt;/template&gt;
-    &lt;/BaseCard&gt;
+              v-pre
+              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+            ><code><span class="text-[#6a9955]">&lt;!-- 1. Tabs & Card --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseTabs</span> <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"currentTab"</span> <span class="text-[#9cdcfe]">:items</span>=<span class="text-[#ce9178]">"items"</span>&gt;
+  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#content-account</span>&gt;
+    &lt;<span class="text-[#4ec9b0]">BaseCard</span> <span class="text-[#9cdcfe]">title</span>=<span class="text-[#ce9178]">"제목"</span>&gt;
+      &lt;<span class="text-[#569cd6]">div</span>&gt;Content...&lt;/<span class="text-[#569cd6]">div</span>&gt;
+    &lt;/<span class="text-[#4ec9b0]">BaseCard</span>&gt;
+  &lt;/<span class="text-[#569cd6]">template</span>&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseTabs</span>&gt;
 
-  &lt;/template&gt;
-&lt;/BaseTabs&gt;</code></pre>
+<span class="text-[#6a9955]">&lt;!-- 2. Accordion --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseAccordion</span> 
+  <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"accordionValue"</span> 
+  <span class="text-[#9cdcfe]">:items</span>=<span class="text-[#ce9178]">"accordionItems"</span>
+&gt;
+  <span class="text-[#6a9955]">&lt;!-- 특정 항목 슬롯 커스텀 (옵션) --&gt;</span>
+  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#content-item-2</span>=<span class="text-[#ce9178]">"{ item }"</span>&gt;
+    &lt;<span class="text-[#569cd6]">div</span>&gt;{{ item.content }}&lt;/<span class="text-[#569cd6]">div</span>&gt;
+  &lt;/<span class="text-[#569cd6]">template</span>&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseAccordion</span>&gt;</code></pre>
           </div>
         </div>
       </section>
@@ -313,36 +368,54 @@ const scrollTo = (id: string) => {
                 </template>
               </BaseTable>
             </div>
+
+            <div class="space-y-4 pt-6 mt-6 border-t border-gray-100">
+              <h4 class="font-bold text-sm">Pagination</h4>
+              <BasePagination
+                v-model:page="paginationPage"
+                :total="120"
+                :items-per-page="10"
+                show-edges
+              />
+            </div>
           </div>
 
-          <div class="bg-gray-900 rounded-xl overflow-hidden text-sm shadow-lg h-fit">
+          <div class="bg-[#1e1e1e] rounded-xl overflow-hidden text-sm shadow-lg h-fit">
             <div
-              class="px-4 py-2 bg-gray-800 border-b border-gray-700 text-gray-400 text-xs font-mono"
+              class="px-4 py-2 bg-[#2d2d2d] border-b border-[#3c3c3c] text-[#cccccc] text-xs font-mono"
             >
               Usage
             </div>
             <pre
               v-pre
-              class="p-4 overflow-x-auto text-gray-300 font-mono leading-relaxed"
-            ><code>&lt;!-- Badge --&gt;
-&lt;BaseBadge <span class="text-blue-400">variant</span>="success"&gt;Active&lt;/BaseBadge&gt;
+              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+            ><code><span class="text-[#6a9955]">&lt;!-- Badge --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseBadge</span> <span class="text-[#9cdcfe]">variant</span>=<span class="text-[#ce9178]">"success"</span>&gt;Active&lt;/<span class="text-[#4ec9b0]">BaseBadge</span>&gt;
 
-&lt;!-- Dropdown --&gt;
-&lt;BaseDropdown <span class="text-purple-400">:items</span>="items"&gt;
-  &lt;BaseButton&gt;Menu&lt;/BaseButton&gt;
-&lt;/BaseDropdown&gt;
+<span class="text-[#6a9955]">&lt;!-- Dropdown --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseDropdown</span> <span class="text-[#9cdcfe]">:items</span>=<span class="text-[#ce9178]">"items"</span>&gt;
+  &lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;Menu&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseDropdown</span>&gt;
 
-&lt;!-- Table with Custom Slot --&gt;
-&lt;BaseTable 
-  <span class="text-purple-400">:columns</span>="columns" 
-  <span class="text-purple-400">:data</span>="data"
-  <span class="text-blue-400">row-key</span>="id"
+<span class="text-[#6a9955]">&lt;!-- Table with Custom Slot --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseTable</span> 
+  <span class="text-[#9cdcfe]">:columns</span>=<span class="text-[#ce9178]">"columns"</span> 
+  <span class="text-[#9cdcfe]">:data</span>=<span class="text-[#ce9178]">"data"</span>
+  <span class="text-[#9cdcfe]">row-key</span>=<span class="text-[#ce9178]">"id"</span>
 &gt;
-  <span class="text-gray-500">&lt;!-- 커스텀 셀: cell-{key} --&gt;</span>
-  &lt;template <span class="text-blue-400">#cell-status</span>="{ value }"&gt;
-    &lt;BaseBadge&gt;{{ value }}&lt;/BaseBadge&gt;
-  &lt;/template&gt;
-&lt;/BaseTable&gt;</code></pre>
+  <span class="text-[#6a9955]">&lt;!-- 커스텀 셀: cell-{key} --&gt;</span>
+  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#cell-status</span>=<span class="text-[#ce9178]">"{ value }"</span>&gt;
+    &lt;<span class="text-[#4ec9b0]">BaseBadge</span>&gt;{{ value }}&lt;/<span class="text-[#4ec9b0]">BaseBadge</span>&gt;
+  &lt;/<span class="text-[#569cd6]">template</span>&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseTable</span>&gt;
+
+<span class="text-[#6a9955]">&lt;!-- Pagination --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BasePagination</span> 
+  <span class="text-[#9cdcfe]">v-model:page</span>=<span class="text-[#ce9178]">"page"</span>
+  <span class="text-[#9cdcfe]">:total</span>=<span class="text-[#ce9178]">"120"</span>
+  <span class="text-[#9cdcfe]">:items-per-page</span>=<span class="text-[#ce9178]">"10"</span>
+  <span class="text-[#9cdcfe]">show-edges</span>
+/&gt;</code></pre>
           </div>
         </div>
       </section>
@@ -358,13 +431,29 @@ const scrollTo = (id: string) => {
         <div class="space-y-4">
           <div class="p-6 border rounded-xl bg-white space-y-4">
             <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Preview</h4>
-            <div class="flex flex-wrap gap-4">
+            <div class="flex flex-wrap gap-4 items-center">
               <BaseButton @click="isDialogOpen = true" variant="outline">Open Dialog</BaseButton>
               <BaseButton @click="handleConfirmTest" variant="danger">Confirm Hook</BaseButton>
 
               <BaseTooltip content="알림 설정으로 이동합니다">
                 <BaseButton variant="ghost" size="sm"><Bell class="w-5 h-5" /></BaseButton>
               </BaseTooltip>
+            </div>
+
+            <div class="space-y-4 pt-6 mt-6 border-t border-gray-100">
+              <h4 class="font-bold text-sm">Toast (vue-sonner)</h4>
+              <div class="flex flex-wrap gap-4">
+                <BaseButton @click="handleToast('default')" variant="outline"
+                  >Default Toast</BaseButton
+                >
+                <BaseButton @click="handleToast('success')" variant="outline"
+                  >Success Toast</BaseButton
+                >
+                <BaseButton @click="handleToast('error')" variant="danger">Error Toast</BaseButton>
+                <BaseButton @click="handleToast('action')" variant="secondary"
+                  >Action Toast</BaseButton
+                >
+              </div>
             </div>
 
             <BaseDialog v-model:open="isDialogOpen" title="제목" description="설명 텍스트입니다.">
@@ -375,34 +464,51 @@ const scrollTo = (id: string) => {
             </BaseDialog>
           </div>
 
-          <div class="bg-gray-900 rounded-xl overflow-hidden text-sm shadow-lg h-fit">
+          <div class="bg-[#1e1e1e] rounded-xl overflow-hidden text-sm shadow-lg h-fit">
             <div
-              class="px-4 py-2 bg-gray-800 border-b border-gray-700 text-gray-400 text-xs font-mono"
+              class="px-4 py-2 bg-[#2d2d2d] border-b border-[#3c3c3c] text-[#cccccc] text-xs font-mono"
             >
               Usage
             </div>
             <pre
-              class="p-4 overflow-x-auto text-gray-300 font-mono leading-relaxed"
-            ><code>&lt;!-- 1. Dialog --&gt;
-&lt;BaseDialog 
-  <span class="text-green-400">v-model:open</span>="isOpen" 
-  <span class="text-blue-400">title</span>="제목"
+              v-pre
+              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+            ><code><span class="text-[#6a9955]">&lt;!-- 1. Dialog --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseDialog</span> 
+  <span class="text-[#9cdcfe]">v-model:open</span>=<span class="text-[#ce9178]">"isOpen"</span> 
+  <span class="text-[#9cdcfe]">title</span>=<span class="text-[#ce9178]">"제목"</span>
 &gt;
-  &lt;div&gt;Content...&lt;/div&gt;
-  &lt;template <span class="text-blue-400">#footer</span>&gt;
-    &lt;BaseButton&gt;Close&lt;/BaseButton&gt;
-  &lt;/template&gt;
-&lt;/BaseDialog&gt;
+  &lt;<span class="text-[#569cd6]">div</span>&gt;Content...&lt;/<span class="text-[#569cd6]">div</span>&gt;
+  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#footer</span>&gt;
+    &lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;Close&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+  &lt;/<span class="text-[#569cd6]">template</span>&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseDialog</span>&gt;
 
-&lt;!-- 2. Tooltip --&gt;
-&lt;BaseTooltip <span class="text-blue-400">content</span>="설명"&gt;
-  &lt;BaseButton&gt;Hover Me&lt;/BaseButton&gt;
-&lt;/BaseTooltip&gt;
+<span class="text-[#6a9955]">&lt;!-- 2. Tooltip --&gt;</span>
+&lt;<span class="text-[#4ec9b0]">BaseTooltip</span> <span class="text-[#9cdcfe]">content</span>=<span class="text-[#ce9178]">"설명"</span>&gt;
+  &lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;Hover Me&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+&lt;/<span class="text-[#4ec9b0]">BaseTooltip</span>&gt;
 
-&lt;!-- 3. Confirm Hook (Script) --&gt;
-const result = await <span class="text-yellow-400">useConfirm</span>({
-  title: '삭제하시겠습니까?',
-  variant: 'danger'
+<span class="text-[#6a9955]">&lt;!-- 3. Confirm Hook (Script) --&gt;</span>
+<span class="text-[#569cd6]">const</span> result = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">useConfirm</span>({
+  <span class="text-[#9cdcfe]">title</span>: <span class="text-[#ce9178]">'삭제하시겠습니까?'</span>,
+  <span class="text-[#9cdcfe]">variant</span>: <span class="text-[#ce9178]">'danger'</span>
+})
+
+<span class="text-[#6a9955]">&lt;!-- 4. Toast (vue-sonner) --&gt;</span>
+<span class="text-[#c586c0]">import</span> { toast } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'vue-sonner'</span>
+
+<span class="text-[#6a9955]">// 상태별 알림</span>
+<span class="text-[#dcdcaa]">toast</span>(<span class="text-[#ce9178]">'기본 알림 메시지입니다.'</span>)
+<span class="text-[#dcdcaa]">toast</span>.<span class="text-[#dcdcaa]">success</span>(<span class="text-[#ce9178]">'성공적으로 저장되었습니다.'</span>)
+<span class="text-[#dcdcaa]">toast</span>.<span class="text-[#dcdcaa]">error</span>(<span class="text-[#ce9178]">'오류가 발생했습니다.'</span>)
+
+<span class="text-[#6a9955]">// Action 버튼 포함</span>
+<span class="text-[#dcdcaa]">toast</span>(<span class="text-[#ce9178]">'삭제되었습니다.'</span>, {
+  <span class="text-[#9cdcfe]">action</span>: {
+    <span class="text-[#9cdcfe]">label</span>: <span class="text-[#ce9178]">'실행 취소'</span>,
+    <span class="text-[#dcdcaa]">onClick</span>: () <span class="text-[#569cd6]">=&gt;</span> <span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#ce9178]">'Undo'</span>)
+  }
 })</code></pre>
           </div>
         </div>

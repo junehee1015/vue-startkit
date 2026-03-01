@@ -7,7 +7,7 @@ import {
   TooltipPortal,
   TooltipContent,
   TooltipArrow,
-} from 'radix-vue'
+} from 'reka-ui'
 
 interface Props {
   content?: string

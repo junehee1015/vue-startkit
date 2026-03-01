@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
-} from 'radix-vue'
+} from 'reka-ui'
 import { X } from 'lucide-vue-next'
 import { cn } from '@/utils/cn'
 

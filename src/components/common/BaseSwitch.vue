@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/utils/cn'
-import { SwitchRoot, SwitchThumb } from 'radix-vue'
+import { SwitchRoot, SwitchThumb } from 'reka-ui'
 
 interface Props {
   id?: string

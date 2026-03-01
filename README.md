@@ -25,7 +25,7 @@
 | **State (Server)** | [TanStack Query v5](https://tanstack.com/query/latest)                          | Auto Caching, Deduping, Background Update |
 | **HTTP**           | [Ofetch](https://github.com/unjs/ofetch)                                        | Fetch API Wrapper (Interceptor 구현)      |
 | **Styling**        | [Tailwind CSS v4](https://tailwindcss.com/)                                     | Utility-first CSS framework               |
-| **UI Primitive**   | [Radix Vue](https://www.radix-vue.com/)                                         | Unstyled, Accessible Components           |
+| **UI Primitive**   | [Reka](https://reka-ui.com/)                                                    | Unstyled, Accessible Components           |
 | **Validation**     | [Vee-Validate](https://vee-validate.logaretm.com/v4/) + [Zod](https://zod.dev/) | Type-safe Form Validation                 |
 
 ---
