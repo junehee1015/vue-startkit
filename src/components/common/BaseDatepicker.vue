@@ -5,126 +5,225 @@ import {
   PopoverContent,
   PopoverPortal,
   CalendarRoot,
+  CalendarCell,
+  CalendarCellTrigger,
+  CalendarGrid,
+  CalendarGridBody,
+  CalendarGridHead,
+  CalendarGridRow,
+  CalendarHeadCell,
   CalendarHeader,
   CalendarHeading,
   CalendarNext,
   CalendarPrev,
-  CalendarGrid,
-  CalendarGridHead,
-  CalendarGridBody,
-  CalendarGridRow,
-  CalendarHeadCell,
-  CalendarCell,
-  CalendarCellTrigger,
+  RangeCalendarRoot,
+  RangeCalendarCell,
+  RangeCalendarCellTrigger,
+  RangeCalendarGrid,
+  RangeCalendarGridBody,
+  RangeCalendarGridHead,
+  RangeCalendarGridRow,
+  RangeCalendarHeadCell,
+  RangeCalendarHeader,
+  RangeCalendarHeading,
+  RangeCalendarNext,
+  RangeCalendarPrev,
 } from 'reka-ui'
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import { parseDate, type DateValue } from '@internationalized/date'
-import dayjs from 'dayjs'
-import { cn } from '@/utils/cn'
+import { parseDate } from '@internationalized/date'
+import type { DateValue } from '@internationalized/date'
+import { CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
-interface Props {
+type StringRange = { start: string | undefined; end: string | undefined }
+type DateValueRange = { start: DateValue | undefined; end: DateValue | undefined }
+
+const { mode = 'single', placeholder = '날짜를 선택하세요' } = defineProps<{
+  mode?: 'single' | 'range'
   placeholder?: string
-  class?: string
+}>()
+
+const singleModel = defineModel<string | undefined>('modelValue')
+const rangeModel = defineModel<StringRange | undefined>('range')
+
+const safeParseDate = (dateStr?: string): DateValue | undefined => {
+  if (!dateStr) return undefined
+  try {
+    return parseDate(dateStr)
+  } catch {
+    return undefined
+  }
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  placeholder: '날짜 선택',
-})
-
-const modelValue = defineModel<string>({ default: '' })
-const isOpen = ref(false)
-
-const calendarValue = computed({
-  get: () => (modelValue.value ? parseDate(modelValue.value) : undefined),
+const internalSingleValue = computed({
+  get: () => safeParseDate(singleModel.value),
   set: (val: DateValue | undefined) => {
-    modelValue.value = val ? val.toString() : ''
-    isOpen.value = false // 선택 시 팝업 닫기
+    singleModel.value = val ? val.toString() : undefined
   },
 })
 
-const displayDate = computed(() => {
-  return modelValue.value ? dayjs(modelValue.value).format('YYYY년 MM월 DD일') : ''
+const internalRangeValue = computed({
+  get: () => {
+    return {
+      start: safeParseDate(rangeModel.value?.start),
+      end: safeParseDate(rangeModel.value?.end),
+    }
+  },
+  set: (val: DateValueRange | undefined) => {
+    if (!val) {
+      rangeModel.value = undefined
+      return
+    }
+    rangeModel.value = {
+      start: val.start ? val.start.toString() : undefined,
+      end: val.end ? val.end.toString() : undefined,
+    }
+  },
+})
+
+const displayValue = computed(() => {
+  if (mode === 'single' && singleModel.value) {
+    return singleModel.value
+  }
+  if (mode === 'range' && rangeModel.value?.start) {
+    const endStr = rangeModel.value.end ? rangeModel.value.end : ''
+    return `${rangeModel.value.start} ~ ${endStr}`
+  }
+  return placeholder
 })
 </script>
 
 <template>
-  <PopoverRoot v-model:open="isOpen">
-    <PopoverTrigger as-child>
-      <button
-        :class="
-          cn(
-            'flex h-10 w-full items-center justify-start rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500',
-            !modelValue && 'text-gray-500',
-            props.class,
-          )
-        "
-      >
-        <CalendarIcon class="mr-2 h-4 w-4 shrink-0 text-gray-500" />
-        {{ modelValue ? displayDate : placeholder }}
-      </button>
+  <PopoverRoot>
+    <PopoverTrigger
+      class="flex items-center gap-2 w-full justify-start text-left border border-gray-300 bg-white px-3 py-2 text-sm rounded-md shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+      :class="
+        (mode === 'single' && !singleModel) || (mode === 'range' && !rangeModel?.start)
+          ? 'text-gray-500'
+          : 'text-gray-900'
+      "
+    >
+      <CalendarIcon class="w-4 h-4 opacity-70" />
+      <span>{{ displayValue }}</span>
     </PopoverTrigger>
 
     <PopoverPortal>
       <PopoverContent
-        align="start"
-        :side-offset="4"
-        class="z-50 w-auto rounded-md border border-gray-200 bg-white p-4 shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+        class="bg-white p-4 rounded-xl shadow-xl border border-gray-100 z-50 animate-in fade-in zoom-in-95"
       >
-        <CalendarRoot v-model="calendarValue" v-slot="{ grid, weekDays }">
-          <CalendarHeader class="flex items-center justify-between pb-4">
+        <CalendarRoot
+          v-if="mode === 'single'"
+          v-model="internalSingleValue"
+          v-slot="{ grid, weekDays }"
+        >
+          <CalendarHeader class="flex items-center justify-between pb-3">
             <CalendarPrev
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 transition-colors text-gray-700"
+              class="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
             >
-              <ChevronLeft class="h-4 w-4" />
+              <ChevronLeft class="w-4 h-4" />
             </CalendarPrev>
             <CalendarHeading class="text-sm font-semibold text-gray-900" />
             <CalendarNext
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 transition-colors text-gray-700"
+              class="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
             >
-              <ChevronRight class="h-4 w-4" />
+              <ChevronRight class="w-4 h-4" />
             </CalendarNext>
           </CalendarHeader>
 
-          <div class="flex flex-col space-y-4 pt-2">
-            <CalendarGrid
-              v-for="month in grid"
-              :key="month.value.toString()"
-              class="w-full border-collapse space-y-1"
-            >
-              <CalendarGridHead>
-                <CalendarGridRow class="flex w-full justify-between mb-2">
-                  <CalendarHeadCell
-                    v-for="day in weekDays"
-                    :key="day"
-                    class="w-9 rounded-md text-[0.8rem] font-medium text-gray-500"
-                  >
-                    {{ day }}
-                  </CalendarHeadCell>
-                </CalendarGridRow>
-              </CalendarGridHead>
-              <CalendarGridBody>
-                <CalendarGridRow
-                  v-for="(weekDates, index) in month.rows"
-                  :key="`weekDate-${index}`"
-                  class="flex w-full justify-between mt-1"
+          <CalendarGrid
+            v-for="month in grid"
+            :key="month.value.toString()"
+            class="w-full border-collapse"
+          >
+            <CalendarGridHead>
+              <CalendarGridRow class="flex mb-2">
+                <CalendarHeadCell
+                  v-for="day in weekDays"
+                  :key="day"
+                  class="w-9 font-medium text-[0.8rem] text-gray-500 text-center"
                 >
-                  <CalendarCell
-                    v-for="weekDate in weekDates"
-                    :key="weekDate.toString()"
-                    :date="weekDate"
-                    class="relative p-0 text-center text-sm focus-within:relative focus-within:z-20"
-                  >
-                    <CalendarCellTrigger
-                      :day="weekDate"
-                      :month="month.value"
-                      class="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 data-selected:bg-blue-600 data-selected:font-medium data-selected:text-white data-selected:hover:bg-blue-600 data-outside-view:text-gray-300 data-disabled:text-gray-300 data-disabled:opacity-50"
-                    />
-                  </CalendarCell>
-                </CalendarGridRow>
-              </CalendarGridBody>
-            </CalendarGrid>
-          </div>
+                  {{ day }}
+                </CalendarHeadCell>
+              </CalendarGridRow>
+            </CalendarGridHead>
+            <CalendarGridBody>
+              <CalendarGridRow
+                v-for="(weekDates, index) in month.rows"
+                :key="`weekDate-${index}`"
+                class="flex w-full mt-1"
+              >
+                <CalendarCell
+                  v-for="weekDate in weekDates"
+                  :key="weekDate.toString()"
+                  :date="weekDate"
+                  class="relative p-0 text-center w-9 h-9"
+                >
+                  <CalendarCellTrigger
+                    :day="weekDate"
+                    :month="month.value"
+                    class="w-9 h-9 text-sm font-normal rounded-md inline-flex items-center justify-center transition-colors hover:bg-gray-100 data-selected:bg-gray-900 data-selected:text-white data-selected:font-medium data-selected:hover:bg-gray-800 data-outside-view:text-gray-300 data-outside-view:pointer-events-none"
+                  />
+                </CalendarCell>
+              </CalendarGridRow>
+            </CalendarGridBody>
+          </CalendarGrid>
         </CalendarRoot>
+
+        <RangeCalendarRoot
+          v-else-if="mode === 'range'"
+          v-model="internalRangeValue"
+          v-slot="{ grid, weekDays }"
+        >
+          <RangeCalendarHeader class="flex items-center justify-between pb-3">
+            <RangeCalendarPrev
+              class="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
+            >
+              <ChevronLeft class="w-4 h-4" />
+            </RangeCalendarPrev>
+            <RangeCalendarHeading class="text-sm font-semibold text-gray-900" />
+            <RangeCalendarNext
+              class="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
+            >
+              <ChevronRight class="w-4 h-4" />
+            </RangeCalendarNext>
+          </RangeCalendarHeader>
+
+          <RangeCalendarGrid
+            v-for="month in grid"
+            :key="month.value.toString()"
+            class="w-full border-collapse"
+          >
+            <RangeCalendarGridHead>
+              <RangeCalendarGridRow class="flex mb-2">
+                <RangeCalendarHeadCell
+                  v-for="day in weekDays"
+                  :key="day"
+                  class="w-9 font-medium text-[0.8rem] text-gray-500 text-center"
+                >
+                  {{ day }}
+                </RangeCalendarHeadCell>
+              </RangeCalendarGridRow>
+            </RangeCalendarGridHead>
+            <RangeCalendarGridBody>
+              <RangeCalendarGridRow
+                v-for="(weekDates, index) in month.rows"
+                :key="`weekDate-${index}`"
+                class="flex w-full mt-1"
+              >
+                <RangeCalendarCell
+                  v-for="weekDate in weekDates"
+                  :key="weekDate.toString()"
+                  :date="weekDate"
+                  class="relative p-0 text-center w-9 h-9"
+                >
+                  <RangeCalendarCellTrigger
+                    :day="weekDate"
+                    :month="month.value"
+                    class="w-9 h-9 text-sm font-normal inline-flex items-center justify-center transition-colors hover:bg-gray-100 data-selected:bg-gray-100 data-selected:text-gray-900 data-selection-start:bg-gray-900 data-selection-start:text-white data-selection-start:rounded-l-md data-selection-start:hover:bg-gray-800 data-selection-end:bg-gray-900 data-selection-end:text-white data-selection-end:rounded-r-md data-selection-end:hover:bg-gray-800 data-outside-view:text-gray-300 data-outside-view:pointer-events-none"
+                  />
+                </RangeCalendarCell>
+              </RangeCalendarGridRow>
+            </RangeCalendarGridBody>
+          </RangeCalendarGrid>
+        </RangeCalendarRoot>
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>

@@ -20,21 +20,39 @@ const roleOptions = [
 ]
 
 // Datepicker State
-const dateValue = ref(dayjs().format('YYYY-MM-DD'))
+const singleDate = ref(dayjs().format('YYYY-MM-DD'))
+
+const rangeDate = ref({
+  start: dayjs().format('YYYY-MM-DD'),
+  end: dayjs().add(7, 'day').format('YYYY-MM-DD'),
+})
 
 // --- 2. Dialog State ---
 const isDialogOpen = ref(false)
 
-// --- 3. Confirm Dialog ---
+// --- 3. Confirm & Alert Hook State ---
 const handleConfirmTest = async () => {
   const result = await useConfirm({
     title: '정말 삭제하시겠습니까?',
     description: '이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.',
-    confirmText: '삭제하기',
+    confirmText: '삭제',
+    cancelText: '취소',
     variant: 'danger',
   })
 
-  if (result) alert('삭제되었습니다!')
+  if (result) {
+    toast.success('성공적으로 삭제되었습니다.')
+  } else {
+    toast('삭제가 취소되었습니다.')
+  }
+}
+
+const handleAlertTest = async () => {
+  await useAlert({
+    title: '세션 만료 안내',
+    description: '안전한 환경을 위해 로그아웃 되었습니다. 다시 로그인해 주세요.',
+    confirmText: '확인',
+  })
 }
 
 // --- 4. Table Data ---
@@ -51,15 +69,15 @@ const tableData = Array.from({ length: 5 }).map((_, i) => ({
   name: `User ${i + 1}`,
   email: `user${i + 1}@example.com`,
   role: i % 2 === 0 ? 'Admin' : 'User',
-  status: i % 3 === 0 ? 'inactive' : 'active',
+  status: i % 3 === 0 ? 'active' : 'inactive',
 }))
 
 // --- 5. Dropdown Items ---
 const dropdownItems = [
-  { label: '프로필', icon: User, onClick: () => alert('Profile') },
+  { label: '프로필', icon: User, onClick: () => toast('Profile') },
   { label: '설정', icon: Settings },
   { separator: true },
-  { label: '로그아웃', icon: LogOut, danger: true, onClick: () => alert('Logout') },
+  { label: '로그아웃', icon: LogOut, danger: true, onClick: () => handleConfirmTest() },
 ]
 
 // --- 6. Layout Demo (Tabs & Accordion) ---
@@ -98,7 +116,7 @@ const handleToast = (type: 'default' | 'success' | 'error' | 'action') => {
     toast('데이터가 삭제되었습니다.', {
       action: {
         label: '실행 취소',
-        onClick: () => alert('실행이 취소되었습니다.'),
+        onClick: () => toast.success('실행이 취소되었습니다.'),
       },
     })
   }
@@ -157,18 +175,18 @@ const scrollTo = (id: string) => {
             </div>
             <pre
               v-pre
-              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+              class="p-4 overflow-x-auto text-[#d4d4d4] bg-[#1e1e1e] font-mono leading-relaxed tracking-wide"
             ><code><span class="text-[#6a9955]">&lt;!-- Variants --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;저장&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
-&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">variant</span>=<span class="text-[#ce9178]">"outline"</span>&gt;취소&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
-&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">variant</span>=<span class="text-[#ce9178]">"danger"</span>&gt;삭제&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">저장</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">variant</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"outline"</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">취소</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">variant</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"danger"</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">삭제</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- States --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">loading</span>&gt;로딩 중...&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
-&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">disabled</span>&gt;비활성화&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">loading</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">로딩 중...</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">disabled</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">비활성화</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- As Link (Router) --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">to</span>=<span class="text-[#ce9178]">"/login"</span>&gt;로그인으로 이동&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;</code></pre>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span> <span class="text-[#9cdcfe]">to</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"/login"</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">로그인으로 이동</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span></code></pre>
           </div>
         </div>
       </section>
@@ -211,8 +229,12 @@ const scrollTo = (id: string) => {
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 mt-6 border-t border-gray-100">
-              <BaseFormField label="날짜 선택">
-                <BaseDatepicker v-model="dateValue" />
+              <BaseFormField label="날짜 선택 (단일)">
+                <BaseDatepicker v-model="singleDate" mode="single" />
+              </BaseFormField>
+
+              <BaseFormField label="기간 선택 (Range)">
+                <BaseDatepicker v-model:range="rangeDate" mode="range" />
               </BaseFormField>
             </div>
           </div>
@@ -225,29 +247,41 @@ const scrollTo = (id: string) => {
             </div>
             <pre
               v-pre
-              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+              class="p-4 overflow-x-auto text-[#d4d4d4] bg-[#1e1e1e] font-mono leading-relaxed tracking-wide"
             ><code><span class="text-[#6a9955]">&lt;!-- 1. Input Group --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseFormField</span> 
-  <span class="text-[#9cdcfe]">label</span>=<span class="text-[#ce9178]">"Email"</span> 
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseFormField</span> 
+  <span class="text-[#9cdcfe]">label</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"Email"</span> 
   <span class="text-[#9cdcfe]">required</span> 
-  <span class="text-[#9cdcfe]">error-message</span>=<span class="text-[#ce9178]">"error"</span>
-&gt;
-  &lt;<span class="text-[#4ec9b0]">BaseInput</span> <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"form.email"</span> /&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseFormField</span>&gt;
+  <span class="text-[#9cdcfe]">error-message</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"error"</span>
+<span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseInput</span> <span class="text-[#9cdcfe]">v-model</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">form</span><span class="text-[#d4d4d4]">.</span><span class="text-[#9cdcfe]">email</span>" <span class="text-[#808080]">/&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseFormField</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- 2. Select --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseSelect</span> 
-  <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"form.role"</span> 
-  <span class="text-[#9cdcfe]">:options</span>=<span class="text-[#ce9178]">"[
-    { label: 'Admin', value: 'admin' },
-    { label: 'User', value: 'user' }
-  ]"</span> 
-/&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseSelect</span> 
+  <span class="text-[#9cdcfe]">v-model</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">form</span><span class="text-[#d4d4d4]">.</span><span class="text-[#9cdcfe]">role</span>"
+  :<span class="text-[#9cdcfe]">options</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#d4d4d4]">[</span>
+    <span class="text-[#d4d4d4]">{</span> <span class="text-[#9cdcfe]">label</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'Admin'</span><span class="text-[#d4d4d4]">,</span> <span class="text-[#9cdcfe]">value</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'admin'</span> <span class="text-[#d4d4d4]">},</span>
+    <span class="text-[#d4d4d4]">{</span> <span class="text-[#9cdcfe]">label</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'User'</span><span class="text-[#d4d4d4]">,</span> <span class="text-[#9cdcfe]">value</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'user'</span> <span class="text-[#d4d4d4]">}</span>
+  <span class="text-[#d4d4d4]">]</span><span class="text-[#ce9178]">"</span> 
+<span class="text-[#808080]">/&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- 3. Datepicker --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseFormField</span> <span class="text-[#9cdcfe]">label</span>=<span class="text-[#ce9178]">"날짜 선택"</span>&gt;
-  &lt;<span class="text-[#4ec9b0]">BaseDatepicker</span> <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"dateValue"</span> /&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseFormField</span>&gt;</code></pre>
+<span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">singleDate</span> <span class="text-[#d4d4d4]">=</span> <span class="text-[#dcdcaa]">ref</span><span class="text-[#d4d4d4]">(</span><span class="text-[#dcdcaa]">dayjs</span><span class="text-[#d4d4d4]">().</span><span class="text-[#dcdcaa]">format</span><span class="text-[#d4d4d4]">(</span><span class="text-[#ce9178]">'YYYY-MM-DD'</span><span class="text-[#d4d4d4]">))</span>
+<span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">rangeDate</span> <span class="text-[#d4d4d4]">=</span> <span class="text-[#dcdcaa]">ref</span><span class="text-[#d4d4d4]">({</span>
+  <span class="text-[#9cdcfe]">start</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#dcdcaa]">dayjs</span><span class="text-[#d4d4d4]">().</span><span class="text-[#dcdcaa]">format</span><span class="text-[#d4d4d4]">(</span><span class="text-[#ce9178]">'YYYY-MM-DD'</span><span class="text-[#d4d4d4]">),</span>
+  <span class="text-[#9cdcfe]">end</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#dcdcaa]">dayjs</span><span class="text-[#d4d4d4]">().</span><span class="text-[#dcdcaa]">add</span><span class="text-[#d4d4d4]">(</span><span class="text-[#b5cea8]">7</span><span class="text-[#d4d4d4]">,</span> <span class="text-[#ce9178]">'day'</span><span class="text-[#d4d4d4]">).</span><span class="text-[#dcdcaa]">format</span><span class="text-[#d4d4d4]">(</span><span class="text-[#ce9178]">'YYYY-MM-DD'</span><span class="text-[#d4d4d4]">),</span>
+<span class="text-[#d4d4d4]">})</span>
+
+<span class="text-[#6a9955]">&lt;!-- Single --&gt;</span>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseFormField</span> <span class="text-[#9cdcfe]">label</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"날짜 선택 (단일)"</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseDatepicker</span> <span class="text-[#9cdcfe]">v-model</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">singleDate</span>" <span class="text-[#9cdcfe]">mode</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"single"</span> <span class="text-[#808080]">/&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseFormField</span><span class="text-[#808080]">&gt;</span>
+
+<span class="text-[#6a9955]">&lt;!-- Range --&gt;</span>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseFormField</span> <span class="text-[#9cdcfe]">label</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"기간 선택 (Range)"</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseDatepicker</span> <span class="text-[#9cdcfe]">v-model:range</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">rangeDate</span>" <span class="text-[#9cdcfe]">mode</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"range"</span> <span class="text-[#808080]">/&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseFormField</span><span class="text-[#808080]">&gt;</span></code></pre>
           </div>
         </div>
       </section>
@@ -301,26 +335,26 @@ const scrollTo = (id: string) => {
             </div>
             <pre
               v-pre
-              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+              class="p-4 overflow-x-auto text-[#d4d4d4] bg-[#1e1e1e] font-mono leading-relaxed tracking-wide"
             ><code><span class="text-[#6a9955]">&lt;!-- 1. Tabs & Card --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseTabs</span> <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"currentTab"</span> <span class="text-[#9cdcfe]">:items</span>=<span class="text-[#ce9178]">"items"</span>&gt;
-  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#content-account</span>&gt;
-    &lt;<span class="text-[#4ec9b0]">BaseCard</span> <span class="text-[#9cdcfe]">title</span>=<span class="text-[#ce9178]">"제목"</span>&gt;
-      &lt;<span class="text-[#569cd6]">div</span>&gt;Content...&lt;/<span class="text-[#569cd6]">div</span>&gt;
-    &lt;/<span class="text-[#4ec9b0]">BaseCard</span>&gt;
-  &lt;/<span class="text-[#569cd6]">template</span>&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseTabs</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseTabs</span> <span class="text-[#9cdcfe]">v-model</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">currentTab</span>" :<span class="text-[#9cdcfe]">items</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">items</span>"<span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#content-account</span><span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseCard</span> <span class="text-[#9cdcfe]">title</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"제목"</span><span class="text-[#808080]">&gt;</span>
+      <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">Content...</span><span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseCard</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseTabs</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- 2. Accordion --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseAccordion</span> 
-  <span class="text-[#9cdcfe]">v-model</span>=<span class="text-[#ce9178]">"accordionValue"</span> 
-  <span class="text-[#9cdcfe]">:items</span>=<span class="text-[#ce9178]">"accordionItems"</span>
-&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseAccordion</span> 
+  <span class="text-[#9cdcfe]">v-model</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">accordionValue</span>" 
+  <span class="text-[#9cdcfe]">:items</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">accordionItems</span>"
+<span class="text-[#808080]">&gt;</span>
   <span class="text-[#6a9955]">&lt;!-- 특정 항목 슬롯 커스텀 (옵션) --&gt;</span>
-  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#content-item-2</span>=<span class="text-[#ce9178]">"{ item }"</span>&gt;
-    &lt;<span class="text-[#569cd6]">div</span>&gt;{{ item.content }}&lt;/<span class="text-[#569cd6]">div</span>&gt;
-  &lt;/<span class="text-[#569cd6]">template</span>&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseAccordion</span>&gt;</code></pre>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#content-item-2</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#d4d4d4]">{ </span><span class="text-[#9cdcfe]">item</span><span class="text-[#d4d4d4]"> }</span>"<span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">{{</span> <span class="text-[#9cdcfe]">item</span><span class="text-[#d4d4d4]">.</span><span class="text-[#9cdcfe]">content</span> <span class="text-[#d4d4d4]">}}</span><span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseAccordion</span><span class="text-[#808080]">&gt;</span></code></pre>
           </div>
         </div>
       </section>
@@ -388,34 +422,34 @@ const scrollTo = (id: string) => {
             </div>
             <pre
               v-pre
-              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+              class="p-4 overflow-x-auto text-[#d4d4d4] bg-[#1e1e1e] font-mono leading-relaxed tracking-wide"
             ><code><span class="text-[#6a9955]">&lt;!-- Badge --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseBadge</span> <span class="text-[#9cdcfe]">variant</span>=<span class="text-[#ce9178]">"success"</span>&gt;Active&lt;/<span class="text-[#4ec9b0]">BaseBadge</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseBadge</span> <span class="text-[#9cdcfe]">variant</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"success"</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">Active</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseBadge</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- Dropdown --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseDropdown</span> <span class="text-[#9cdcfe]">:items</span>=<span class="text-[#ce9178]">"items"</span>&gt;
-  &lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;Menu&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseDropdown</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseDropdown</span> :<span class="text-[#9cdcfe]">items</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">items</span>"<span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">Menu</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseDropdown</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- Table with Custom Slot --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseTable</span> 
-  <span class="text-[#9cdcfe]">:columns</span>=<span class="text-[#ce9178]">"columns"</span> 
-  <span class="text-[#9cdcfe]">:data</span>=<span class="text-[#ce9178]">"data"</span>
-  <span class="text-[#9cdcfe]">row-key</span>=<span class="text-[#ce9178]">"id"</span>
-&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseTable</span> 
+  :<span class="text-[#9cdcfe]">columns</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">columns</span>" 
+  :<span class="text-[#9cdcfe]">data</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">data</span>"
+  <span class="text-[#9cdcfe]">row-key</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"id"</span>
+<span class="text-[#808080]">&gt;</span>
   <span class="text-[#6a9955]">&lt;!-- 커스텀 셀: cell-{key} --&gt;</span>
-  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#cell-status</span>=<span class="text-[#ce9178]">"{ value }"</span>&gt;
-    &lt;<span class="text-[#4ec9b0]">BaseBadge</span>&gt;{{ value }}&lt;/<span class="text-[#4ec9b0]">BaseBadge</span>&gt;
-  &lt;/<span class="text-[#569cd6]">template</span>&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseTable</span>&gt;
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#cell-status</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#d4d4d4]">{ </span><span class="text-[#9cdcfe]">value</span><span class="text-[#d4d4d4]"> }</span>"<span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseBadge</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">{{</span> <span class="text-[#9cdcfe]">value</span> <span class="text-[#d4d4d4]">}}</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseBadge</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseTable</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- Pagination --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BasePagination</span> 
-  <span class="text-[#9cdcfe]">v-model:page</span>=<span class="text-[#ce9178]">"page"</span>
-  <span class="text-[#9cdcfe]">:total</span>=<span class="text-[#ce9178]">"120"</span>
-  <span class="text-[#9cdcfe]">:items-per-page</span>=<span class="text-[#ce9178]">"10"</span>
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BasePagination</span> 
+  <span class="text-[#9cdcfe]">v-model</span>:<span class="text-[#9cdcfe]">page</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">page</span>"
+  :<span class="text-[#9cdcfe]">total</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#b5cea8]">120</span>"
+  :<span class="text-[#9cdcfe]">items-per-page</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#b5cea8]">10</span>"
   <span class="text-[#9cdcfe]">show-edges</span>
-/&gt;</code></pre>
+<span class="text-[#808080]">/&gt;</span></code></pre>
           </div>
         </div>
       </section>
@@ -434,6 +468,7 @@ const scrollTo = (id: string) => {
             <div class="flex flex-wrap gap-4 items-center">
               <BaseButton @click="isDialogOpen = true" variant="outline">Open Dialog</BaseButton>
               <BaseButton @click="handleConfirmTest" variant="danger">Confirm Hook</BaseButton>
+              <BaseButton @click="handleAlertTest" variant="secondary">Alert Hook</BaseButton>
 
               <BaseTooltip content="알림 설정으로 이동합니다">
                 <BaseButton variant="ghost" size="sm"><Bell class="w-5 h-5" /></BaseButton>
@@ -472,44 +507,46 @@ const scrollTo = (id: string) => {
             </div>
             <pre
               v-pre
-              class="p-4 overflow-x-auto text-[#d4d4d4] font-mono leading-relaxed"
+              class="p-4 overflow-x-auto text-[#d4d4d4] bg-[#1e1e1e] font-mono leading-relaxed tracking-wide"
             ><code><span class="text-[#6a9955]">&lt;!-- 1. Dialog --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseDialog</span> 
-  <span class="text-[#9cdcfe]">v-model:open</span>=<span class="text-[#ce9178]">"isOpen"</span> 
-  <span class="text-[#9cdcfe]">title</span>=<span class="text-[#ce9178]">"제목"</span>
-&gt;
-  &lt;<span class="text-[#569cd6]">div</span>&gt;Content...&lt;/<span class="text-[#569cd6]">div</span>&gt;
-  &lt;<span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#footer</span>&gt;
-    &lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;Close&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
-  &lt;/<span class="text-[#569cd6]">template</span>&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseDialog</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseDialog</span> 
+  <span class="text-[#9cdcfe]">v-model</span>:<span class="text-[#9cdcfe]">open</span><span class="text-[#d4d4d4]">=</span>"<span class="text-[#9cdcfe]">isOpen</span>" 
+  <span class="text-[#9cdcfe]">title</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"제목"</span>
+<span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">Content...</span><span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">div</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">template</span> <span class="text-[#9cdcfe]">#footer</span><span class="text-[#808080]">&gt;</span>
+    <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">Close</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">template</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseDialog</span><span class="text-[#808080]">&gt;</span>
 
 <span class="text-[#6a9955]">&lt;!-- 2. Tooltip --&gt;</span>
-&lt;<span class="text-[#4ec9b0]">BaseTooltip</span> <span class="text-[#9cdcfe]">content</span>=<span class="text-[#ce9178]">"설명"</span>&gt;
-  &lt;<span class="text-[#4ec9b0]">BaseButton</span>&gt;Hover Me&lt;/<span class="text-[#4ec9b0]">BaseButton</span>&gt;
-&lt;/<span class="text-[#4ec9b0]">BaseTooltip</span>&gt;
+<span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseTooltip</span> <span class="text-[#9cdcfe]">content</span><span class="text-[#d4d4d4]">=</span><span class="text-[#ce9178]">"설명"</span><span class="text-[#808080]">&gt;</span>
+  <span class="text-[#808080]">&lt;</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span><span class="text-[#d4d4d4]">Hover Me</span><span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseButton</span><span class="text-[#808080]">&gt;</span>
+<span class="text-[#808080]">&lt;/</span><span class="text-[#4ec9b0]">BaseTooltip</span><span class="text-[#808080]">&gt;</span>
 
-<span class="text-[#6a9955]">&lt;!-- 3. Confirm Hook (Script) --&gt;</span>
-<span class="text-[#569cd6]">const</span> result = <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">useConfirm</span>({
-  <span class="text-[#9cdcfe]">title</span>: <span class="text-[#ce9178]">'삭제하시겠습니까?'</span>,
-  <span class="text-[#9cdcfe]">variant</span>: <span class="text-[#ce9178]">'danger'</span>
-})
+<span class="text-[#6a9955]">&lt;!-- 3. Confirm Hook & Alert Hook (Script) --&gt;</span>
+<span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">handleDelete</span> <span class="text-[#d4d4d4]">=</span> <span class="text-[#569cd6]">async</span> <span class="text-[#d4d4d4]">()</span> <span class="text-[#569cd6]">=&gt;</span> <span class="text-[#d4d4d4]">{</span>
+  <span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">isConfirmed</span> <span class="text-[#d4d4d4]">=</span> <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">useConfirm</span><span class="text-[#d4d4d4]">({</span>
+    <span class="text-[#9cdcfe]">title</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'삭제하시겠습니까?'</span><span class="text-[#d4d4d4]">,</span>
+    <span class="text-[#9cdcfe]">description</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'이 작업은 되돌릴 수 없습니다.'</span><span class="text-[#d4d4d4]">,</span>
+    <span class="text-[#9cdcfe]">confirmText</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'삭제'</span><span class="text-[#d4d4d4]">,</span>
+    <span class="text-[#9cdcfe]">variant</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'danger'</span>
+  <span class="text-[#d4d4d4]">})</span>
+  <span class="text-[#c586c0]">if</span> <span class="text-[#d4d4d4]">(</span><span class="text-[#4fc1ff]">isConfirmed</span><span class="text-[#d4d4d4]">) {</span> <span class="text-[#6a9955]">/* 승인 로직 */</span> <span class="text-[#d4d4d4]">}</span>
+<span class="text-[#d4d4d4]">}</span>
+
+<span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">showNotice</span> <span class="text-[#d4d4d4]">=</span> <span class="text-[#569cd6]">async</span> <span class="text-[#d4d4d4]">()</span> <span class="text-[#569cd6]">=&gt;</span> <span class="text-[#d4d4d4]">{</span>
+  <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">useAlert</span><span class="text-[#d4d4d4]">({</span>
+    <span class="text-[#9cdcfe]">title</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'안내'</span><span class="text-[#d4d4d4]">,</span>
+    <span class="text-[#9cdcfe]">description</span><span class="text-[#d4d4d4]">:</span> <span class="text-[#ce9178]">'세션이 만료되었습니다.'</span><span class="text-[#d4d4d4]">,</span>
+  <span class="text-[#d4d4d4]">})</span>
+<span class="text-[#d4d4d4]">}</span>
 
 <span class="text-[#6a9955]">&lt;!-- 4. Toast (vue-sonner) --&gt;</span>
-<span class="text-[#c586c0]">import</span> { toast } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'vue-sonner'</span>
+<span class="text-[#c586c0]">import</span> <span class="text-[#d4d4d4]">{</span> <span class="text-[#9cdcfe]">toast</span> <span class="text-[#d4d4d4]">}</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'vue-sonner'</span>
 
-<span class="text-[#6a9955]">// 상태별 알림</span>
-<span class="text-[#dcdcaa]">toast</span>(<span class="text-[#ce9178]">'기본 알림 메시지입니다.'</span>)
-<span class="text-[#dcdcaa]">toast</span>.<span class="text-[#dcdcaa]">success</span>(<span class="text-[#ce9178]">'성공적으로 저장되었습니다.'</span>)
-<span class="text-[#dcdcaa]">toast</span>.<span class="text-[#dcdcaa]">error</span>(<span class="text-[#ce9178]">'오류가 발생했습니다.'</span>)
-
-<span class="text-[#6a9955]">// Action 버튼 포함</span>
-<span class="text-[#dcdcaa]">toast</span>(<span class="text-[#ce9178]">'삭제되었습니다.'</span>, {
-  <span class="text-[#9cdcfe]">action</span>: {
-    <span class="text-[#9cdcfe]">label</span>: <span class="text-[#ce9178]">'실행 취소'</span>,
-    <span class="text-[#dcdcaa]">onClick</span>: () <span class="text-[#569cd6]">=&gt;</span> <span class="text-[#9cdcfe]">console</span>.<span class="text-[#dcdcaa]">log</span>(<span class="text-[#ce9178]">'Undo'</span>)
-  }
-})</code></pre>
+<span class="text-[#dcdcaa]">toast</span><span class="text-[#d4d4d4]">.</span><span class="text-[#dcdcaa]">success</span><span class="text-[#d4d4d4]">(</span><span class="text-[#ce9178]">'성공적으로 저장되었습니다.'</span><span class="text-[#d4d4d4]">)</span>
+<span class="text-[#dcdcaa]">toast</span><span class="text-[#d4d4d4]">.</span><span class="text-[#dcdcaa]">error</span><span class="text-[#d4d4d4]">(</span><span class="text-[#ce9178]">'오류가 발생했습니다.'</span><span class="text-[#d4d4d4]">)</span></code></pre>
           </div>
         </div>
       </section>

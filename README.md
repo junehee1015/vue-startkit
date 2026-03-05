@@ -6,7 +6,6 @@
 ## ✨ Key Features
 
 - **Architecture**:
-  - **FSD Lite**: 도메인 주도 설계를 위한 API 모듈화 및 Composable 패턴
   - **3-Layer Fetching**: `API Definition` -> `Query Composable` -> `View Component`
 - **Developer Experience**:
   - **Auto Import**: Vue, Router, Pinia, Zod 등 자동 임포트

@@ -35,11 +35,13 @@ export const request = async <T = unknown>(
     return await _apiInstance<T>(url, options)
   } catch (e) {
     const error = e as FetchError
-    const authStore = useAuthStore()
+
     // auth 관련 API는 무한 루프 방지를 위해 토큰 갱신 로직을 타지 않음
     const isAuthPath = url.includes('/login') || url.includes('/refresh')
 
     if (error.response?.status === 401 && !options._retry && !isAuthPath) {
+      const authStore = useAuthStore()
+
       // 1. 갱신 작업이 없다면 새로운 갱신 Promise 생성
       if (!refreshPromise) {
         refreshPromise = authStore.refreshAccessToken().finally(() => {

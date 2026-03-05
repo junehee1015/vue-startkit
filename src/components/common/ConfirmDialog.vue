@@ -6,8 +6,7 @@ import {
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
+  VisuallyHidden,
 } from 'reka-ui'
 
 const { isOpen, options, handleConfirm, handleCancel, handleOpenChange } = useConfirmState()
@@ -30,23 +29,24 @@ const { isOpen, options, handleConfirm, handleCancel, handleOpenChange } = useCo
           <AlertDialogDescription v-if="options.description" class="text-sm text-gray-500">
             {{ options.description }}
           </AlertDialogDescription>
+          <VisuallyHidden v-else as-child>
+            <AlertDialogDescription>
+              이 알림창에는 세부 설명이 포함되어 있지 않습니다.
+            </AlertDialogDescription>
+          </VisuallyHidden>
         </div>
 
         <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <AlertDialogCancel as-child v-if="!options.hideCancel">
-            <BaseButton variant="outline" @click="handleCancel">
-              {{ options.cancelText }}
-            </BaseButton>
-          </AlertDialogCancel>
+          <BaseButton v-if="!options.hideCancel" variant="outline" @click="handleCancel">
+            {{ options.cancelText }}
+          </BaseButton>
 
-          <AlertDialogAction as-child>
-            <BaseButton
-              :variant="options.variant === 'danger' ? 'danger' : 'primary'"
-              @click="handleConfirm"
-            >
-              {{ options.confirmText }}
-            </BaseButton>
-          </AlertDialogAction>
+          <BaseButton
+            :variant="options.variant === 'danger' ? 'danger' : 'primary'"
+            @click="handleConfirm"
+          >
+            {{ options.confirmText }}
+          </BaseButton>
         </div>
       </AlertDialogContent>
     </AlertDialogPortal>

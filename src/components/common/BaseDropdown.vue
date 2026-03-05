@@ -30,7 +30,7 @@ const { items = [], label, align = 'end', width = 'w-56' } = defineProps<Props>(
 </script>
 
 <template>
-  <DropdownMenuRoot>
+  <DropdownMenuRoot :modal="false">
     <DropdownMenuTrigger as-child>
       <slot />
     </DropdownMenuTrigger>
