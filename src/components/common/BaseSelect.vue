@@ -58,6 +58,7 @@ const model = defineModel<string>()
         class="relative z-50 min-w-32 overflow-hidden rounded-md border bg-white shadow-md animate-in fade-in-80"
         position="popper"
         :side-offset="5"
+        :bodyLock="false"
       >
         <SelectViewport class="p-1">
           <SelectItem
