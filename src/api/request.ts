@@ -16,12 +16,6 @@ const _apiInstance = ofetch.create({
   },
 })
 
-// refreshtoken을 위한 순수 ofetch instance
-export const refreshRequest = ofetch.create({
-  baseURL: BASE_URL,
-  retry: 0,
-})
-
 // 2. 외부로 내보낼 Wrapper 함수
 // 1) ofetch 특성 상 인스턴스 내에서 에러 처리를 하게 되면 void 값을 기대하기 때문에 재요청 시 타입 에러가 나기 때문에 에러 처리를 Wrapper 함수로 분리.
 // 2) 순환 참조(무한 루프) 방지 -> Wrapper 함수로 분리하고 _retry 트리거 사용.
@@ -67,9 +61,11 @@ export const request = async <T = unknown>(
         authStore.logout()
 
         // 로그인 페이지가 아니라면 튕겨내기
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login'
-        }
+        import('@/router').then(({ default: router }) => {
+          if (router.currentRoute.value.path !== '/login') {
+            router.replace('/login')
+          }
+        })
 
         throw refreshError
       }

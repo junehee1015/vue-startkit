@@ -27,7 +27,7 @@ const validationSchema = toTypedSchema(
 const { handleSubmit, isSubmitting, defineField, errors } = useForm({
   validationSchema,
   initialValues: {
-    email: savedEmail || '',
+    email: savedEmail || 'admin@example.com',
     password: '1234',
     rememberMe: !!savedEmail,
   },
@@ -63,25 +63,13 @@ const onSubmit = handleSubmit(async (values) => {
 
     <form @submit="onSubmit" class="space-y-6">
       <BaseFormField label="이메일" :error-message="errors.email" v-slot="{ id }">
-        <BaseInput
-          v-model="email"
-          v-bind="emailProps"
-          :id="id"
-          type="email"
-          placeholder="admin@example.com"
-          :invalid="!!errors.email"
-        />
+        <BaseInput v-model="email" v-bind="emailProps" :id="id" type="email" placeholder="admin@example.com"
+          :invalid="!!errors.email" />
       </BaseFormField>
 
       <BaseFormField label="비밀번호" :error-message="errors.password" v-slot="{ id }">
-        <BaseInput
-          v-model="password"
-          v-bind="passwordProps"
-          :id="id"
-          type="password"
-          placeholder="••••••••"
-          :invalid="!!errors.password"
-        />
+        <BaseInput v-model="password" v-bind="passwordProps" :id="id" type="password" placeholder="••••••••"
+          :invalid="!!errors.password" />
       </BaseFormField>
 
       <div class="flex items-center justify-between">

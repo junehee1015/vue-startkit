@@ -1,3 +1,5 @@
+import { ofetch } from 'ofetch'
+
 interface User {
   name: string
   email: string
@@ -41,7 +43,16 @@ export const useAuthStore = defineStore(
     // Access Token이 만료되었을 때 호출됨
     const refreshAccessToken = async (): Promise<void> => {
       try {
-        // 순환 참조 방지를 위해 순수 ofetch인 refreshRequest instance를 사용해야 함
+        // const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+        // 실제 토큰 변경 시 순수 인스턴스 사용해야 함
+        // const response = ofetch<{ accessToken: string }>('/refresh', {
+        //   baseURL: BASE_URL,
+        //   method: 'POST',
+        //   body: {
+        //     refreshToken: refreshToken.value,
+        //   },
+        // })
 
         // API 지연 시뮬레이션
         await new Promise((resolve) => setTimeout(resolve, 300))
