@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { QueryKey } from '@tanstack/vue-query'
+
 const props = defineProps<{
-  queryKey?: any[]
+  queryKey?: QueryKey
 }>()
 
 const emit = defineEmits<{
@@ -34,8 +36,10 @@ onErrorCaptured((err) => {
           <p class="text-sm font-medium text-red-600">
             {{ error.message || '데이터를 불러오는 중 문제가 발생했습니다.' }}
           </p>
-          <button @click="reset"
-            class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition-colors">
+          <button
+            @click="reset"
+            class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition-colors"
+          >
             다시 시도
           </button>
         </div>

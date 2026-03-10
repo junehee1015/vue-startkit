@@ -7,7 +7,7 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
   // meta.requiresAuth가 명시적으로 false인 경우만 '공개' 페이지
@@ -17,16 +17,15 @@ router.beforeEach(async (to, from, next) => {
 
   // 비로그인 유저가 '인증 필요 페이지' 접근 시
   if (!isPublic && !isAuthenticated) {
-    return next({ name: ROUTE_NAMES.LOGIN })
+    return { name: ROUTE_NAMES.LOGIN }
   }
 
   // 이미 로그인한 유저가 '로그인/회원가입' 페이지 접근 시 홈으로
   if (isAuthenticated && to.name === ROUTE_NAMES.LOGIN) {
-    return next({ name: ROUTE_NAMES.HOME })
+    return { name: ROUTE_NAMES.HOME }
   }
 
   // 그 외 통과
-  next()
 })
 
 if (import.meta.hot) {

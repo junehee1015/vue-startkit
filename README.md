@@ -38,7 +38,7 @@ src/
 │   └── request.ts          # Ofetch 인스턴스 (Interceptor & Token Logic)
 ├── assets/                 # 정적 리소스 (Images, Fonts, CSS)
 ├── components/
-│   ├── common/             # 원자 단위 공통 컴포넌트 (BaseButton, BaseInput...)
+│   ├── common/             # 원자 단위 공통 컴포넌트 (BaseButton, BaseInput, ErrorBoundary...)
 │   ├── guide/              # (개발 가이드용 컴포넌트 - 배포 시 제외 가능)
 │   └── layouts/            # layouts 공통 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
 ├── composables/            # 재사용 가능한 로직
@@ -151,59 +151,64 @@ export const useCreateUserMutation = () => {
 
 **Step 3: 컴포넌트 사용 (`src/pages/*.vue`)** 컴포넌트는 비즈니스 로직 없이 데이터 바인딩에만 집중합니다.
 
+페이지의 중요도와 UI 구성에 따라 **부모에게 위임(ErrorBoundary)** 하거나 자식에서 **직접(try-catch)** 처리할 수 있습니다.
+
+**📌 Case A: 부모에게 위임 (ErrorBoundary 공통 컴포넌트 사용)** -
+에러 발생 시 부모 컴포넌트에서 에러를 가로챕니다. 자식은 성공했을 때의 UI만 작성합니다.
+
 ```typescript
 // src/components/UserList.vue - Children
 <script setup lang="ts">
-import { useUserListQuery } from '@/composables/queries/useUserQueries'
+import { useUserListQuery } from '@/composables/queries/useUserQuery'
 
-const page = ref(1)
+const { data: users, suspense } = useUserListQuery(page)
 
-// v-if="isLoading" 대신, 반환된 suspense() 함수를 await 합니다!
-// 이를 통해 컴포넌트가 일시 정지(Suspend) 되며 부모에게 로딩 제어권이 넘어갑니다.
-// 에러 처리를 위해 isError와 error 객체도 함께 가져옵니다.
-const { data: users, suspense, isError, error } = useUserListQuery(page)
-
-// [Component 에러 처리] 에러 발생 시 UI를 제어하기 위해 try-catch로 감쌉니다.
-try {
-  await suspense()
-} catch (err) {
-  console.error('컴포넌트 단 UI 에러 처리 수행')
-}
+await suspense()
 </script>
 
 <template>
-  <!-- 에러 발생 시 보여줄 컴포넌트 UI 방어 코드 -->
-  <div v-if="isError" class="text-red-500">
-    에러가 발생했습니다: {{ error?.message }}
-  </div>
-  <!-- 안전하게 데이터를 즉시 그립니다. (isLoading 체킹 불필요) -->
-  <ul v-else>
+  <ul>
     <li v-for="user in users" :key="user.id">{{ user.name }}</li>
   </ul>
 </template>
 ```
 
-```typescript
+```vue
 // src/pages/users/index.vue - Parent
+<template>
+  <!-- query-key를 넘겨주면 캐시 자동 초기화 기능을 제공합니다. -->
+  <ErrorBoundary :query-key="userKeys.all">
+    <Suspense>
+      <UserList />
+      <template #fallback>로딩 중...</template>
+    </Suspense>
+  </ErrorBoundary>
+</template>
+```
+
+**📌 Case B: 자식 내부에서 직접 처리** -
+실패해도 페이지 전체가 깨지면 안 되는 경우, try-catch로 자식 내부에서 에러를 처리합니다.
+
+```vue
+// src/components/WeatherWidget.vue - Children
 <script setup lang="ts">
-import UserList from '@/components/UserList.vue'
+import { useWeatherQuery } from '@/composables/queries/useWidgetQuery'
+
+// 💡 자체 처리를 위해 isError를 가져옵니다.
+const { data: weather, suspense, isError } = useWeatherQuery()
+
+try {
+  await suspense()
+} catch (error) {
+  // 자식 컴포넌트에서 에러 처리를 합니다.
+  console.error('날씨 위젯 로딩 실패')
+}
 </script>
 
 <template>
-  <div>
-    <h1>사용자 목록 관리</h1>
+  <div v-if="isError" class="text-gray-400 text-sm">날씨 정보를 불러올 수 없습니다.</div>
 
-    <!-- 비동기 컴포넌트의 로딩 상태를 여기서 일괄 제어합니다. -->
-    <Suspense>
-      <template #default>
-        <UserList />
-      </template>
-
-      <template #fallback>
-        <div class="animate-pulse bg-gray-200 h-32 rounded">데이터를 불러오는 중...</div>
-      </template>
-    </Suspense>
-  </div>
+  <div v-else>오늘의 날씨: {{ weather.temperature }}도</div>
 </template>
 ```
 
