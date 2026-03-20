@@ -6,7 +6,7 @@ import { ROUTE_NAMES } from '@/constants/routes'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
+const { logout } = useAuth()
 
 const breadcrumbs = computed(() => {
   return route.matched
@@ -21,10 +21,10 @@ const userMenuItems: DropdownItem[] = [
   { label: '프로필', icon: User, onClick: () => alert('Profile') },
   { label: '설정', icon: Settings },
   { separator: true },
-  { label: '로그아웃', icon: LogOut, danger: true, onClick: () => logout() },
+  { label: '로그아웃', icon: LogOut, danger: true, onClick: () => excuteLogout() },
 ]
 
-const logout = async () => {
+const excuteLogout = async () => {
   const isConfirmed = await useConfirm({
     title: '로그아웃 하시겠습니까?',
     cancelText: '취소',
@@ -33,8 +33,8 @@ const logout = async () => {
 
   if (!isConfirmed) return
 
-  authStore.logout()
-  router.replace({ name: ROUTE_NAMES.LOGIN })
+  await logout()
+  await router.replace({ name: ROUTE_NAMES.LOGIN })
 
   toast.error('로그아웃 되었습니다.')
 }

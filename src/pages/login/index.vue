@@ -12,7 +12,7 @@ definePage({
 })
 
 const router = useRouter()
-const authStore = useAuthStore()
+const { login } = useAuth()
 
 const savedEmail = localStorage.getItem('saved_email')
 
@@ -39,7 +39,7 @@ const [rememberMe] = defineField('rememberMe')
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await authStore.login(values)
+    await login(values)
 
     if (values.rememberMe) {
       localStorage.setItem('saved_email', values.email)
@@ -63,13 +63,25 @@ const onSubmit = handleSubmit(async (values) => {
 
     <form @submit="onSubmit" class="space-y-6">
       <BaseFormField label="이메일" :error-message="errors.email" v-slot="{ id }">
-        <BaseInput v-model="email" v-bind="emailProps" :id="id" type="email" placeholder="admin@example.com"
-          :invalid="!!errors.email" />
+        <BaseInput
+          v-model="email"
+          v-bind="emailProps"
+          :id="id"
+          type="email"
+          placeholder="admin@example.com"
+          :invalid="!!errors.email"
+        />
       </BaseFormField>
 
       <BaseFormField label="비밀번호" :error-message="errors.password" v-slot="{ id }">
-        <BaseInput v-model="password" v-bind="passwordProps" :id="id" type="password" placeholder="••••••••"
-          :invalid="!!errors.password" />
+        <BaseInput
+          v-model="password"
+          v-bind="passwordProps"
+          :id="id"
+          type="password"
+          placeholder="••••••••"
+          :invalid="!!errors.password"
+        />
       </BaseFormField>
 
       <div class="flex items-center justify-between">

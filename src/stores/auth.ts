@@ -1,6 +1,4 @@
-import { ofetch } from 'ofetch'
-
-interface User {
+export interface User {
   name: string
   email: string
   role: string
@@ -20,62 +18,16 @@ export const useAuthStore = defineStore(
 
     const isAuthenticated = computed(() => !!accessToken.value)
 
-    // 1. 로그인
-    const login = async (values: LoginPayload) => {
-      // API 지연 시뮬레이션
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      if (values.email !== 'admin@example.com' || values.password !== '1234') {
-        throw new Error('아이디 또는 비밀번호가 일치하지 않습니다.')
-      }
-
-      // 토큰 발급 (실제로는 서버에서 받아옴)
-      accessToken.value = 'mock-access-token-' + Date.now()
-      refreshToken.value = 'mock-refresh-token-' + Date.now()
-      user.value = {
-        name: 'Juny Jo',
-        email: values.email,
-        role: 'Admin',
-      }
+    const setAuthData = (newAccessToken: string, newRefreshToken: string, userData: User) => {
+      accessToken.value = newAccessToken
+      refreshToken.value = newRefreshToken
+      user.value = userData
     }
 
-    // 2. 토큰 갱신 (Mock)
-    // Access Token이 만료되었을 때 호출됨
-    const refreshAccessToken = async (): Promise<void> => {
-      try {
-        // const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-
-        // 실제 토큰 변경 시 순수 인스턴스 사용해야 함
-        // const response = ofetch<{ accessToken: string }>('/refresh', {
-        //   baseURL: BASE_URL,
-        //   method: 'POST',
-        //   body: {
-        //     refreshToken: refreshToken.value,
-        //   },
-        // })
-
-        // API 지연 시뮬레이션
-        await new Promise((resolve) => setTimeout(resolve, 300))
-
-        // 리프레시 토큰이 없으면 실패 처리
-        if (!refreshToken.value) throw new Error('No refresh token')
-
-        // 리프레시 토큰을 서버에 보내고 새 엑세스 토큰을 받음
-        accessToken.value = 'new-access-token-' + Date.now()
-      } catch (error) {
-        logout() // 갱신 실패 시 강제 로그아웃
-        throw error
-      }
-    }
-
-    // 3. 로그아웃
-    const logout = async () => {
-      user.value = null
+    const clearAuthData = () => {
       accessToken.value = null
       refreshToken.value = null
-
-      await nextTick()
-      localStorage.removeItem('auth')
+      user.value = null
     }
 
     return {
@@ -83,9 +35,8 @@ export const useAuthStore = defineStore(
       accessToken,
       refreshToken,
       isAuthenticated,
-      login,
-      refreshAccessToken,
-      logout,
+      setAuthData,
+      clearAuthData,
     }
   },
   {
