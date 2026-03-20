@@ -1,4 +1,4 @@
-import { useAuthStore, type LoginPayload, type User } from '@/stores/authStore'
+import { useAuthStore, type LoginPayload, type User } from '@/stores/auth'
 // import { ofetch } from 'ofetch'
 // import { request } from '@/api/request' //
 
