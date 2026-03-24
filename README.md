@@ -50,6 +50,8 @@ src/
 ├── layouts/                # 페이지 레이아웃 (Default, Empty)
 ├── pages/                  # 파일 기반 라우팅 (File-based Routing)
 ├── plugins/                # App Bootstrapping (Pinia, Router, Query 설정 분리)
+├── router/                 #
+│   └── index.ts            # 네비게이션 가드
 ├── stores/                 # Pinia 전역 스토어
 ├── types/                  # TypeScript 인터페이스 및 Zod 스키마
 └── utils/                  # 순수 헬퍼 함수
