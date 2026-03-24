@@ -44,8 +44,8 @@
       </div>
 
       <p class="text-gray-600 text-sm">
-        <code>src/api/modules</code> 폴더에 도메인별 통신 함수를 만듭니다. 파라미터(Params/Query)를
-        명시적으로 전달합니다.
+        <code>src/features/[도메인]/api/index.ts</code> 폴더에 도메인별 통신 함수를 만듭니다.
+        파라미터(Params/Query)를 명시적으로 전달합니다.
       </p>
 
       <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
@@ -87,7 +87,7 @@
         >
 
         <h3 class="text-xl font-bold text-gray-800">
-          Query Hook & Key Factory (src/composables/queries)
+          Query Hook & Key Factory (src/features/[도메인]/model/composables/*.ts)
         </h3>
       </div>
 
@@ -105,12 +105,12 @@
 
             <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
           </div>
-          <span class="text-gray-400">src/composables/queries/useUserQueries.ts</span>
+          <span class="text-gray-400">src/features/user/model/composables/useUser.ts</span>
         </div>
 
         <pre
           class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
-        ><code><span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">fetchUsers</span>, <span class="text-[#9cdcfe]">createUser</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/api/modules/users'</span>
+        ><code><span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">fetchUsers</span>, <span class="text-[#9cdcfe]">createUser</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/features/user/api'</span>
 <span class="text-[#c586c0]">import</span> <span class="text-[#569cd6]">type</span> { <span class="text-[#4ec9b0]">Ref</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'vue'</span>
 
 <span class="text-[#6a9955]">// 1. Key Factory Pattern (배열 형태의 확장 가능한 키 구조)</span>
@@ -121,7 +121,7 @@
 }
 
 <span class="text-[#6a9955]">// 2. Query Hook (목록 조회)</span>
-<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">useUserListQuery</span> = (<span class="text-[#9cdcfe]">page</span>: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">number</span>&gt;, <span class="text-[#9cdcfe]">status</span>?: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">string</span>&gt;) <span class="text-[#569cd6]">=&gt;</span> {
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">useUserList</span> = (<span class="text-[#9cdcfe]">page</span>: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">number</span>&gt;, <span class="text-[#9cdcfe]">status</span>?: <span class="text-[#4ec9b0]">Ref</span>&lt;<span class="text-[#4ec9b0]">string</span>&gt;) <span class="text-[#569cd6]">=&gt;</span> {
   <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">useQuery</span>({
     <span class="text-[#9cdcfe]">queryKey</span>: <span class="text-[#4fc1ff]">userKeys</span>.<span class="text-[#dcdcaa]">list</span>(<span class="text-[#9cdcfe]">page</span>, <span class="text-[#9cdcfe]">status</span>), <span class="text-[#6a9955]">// 반응형 변수가 변경되면 자동 재요청</span>
     <span class="text-[#dcdcaa]">queryFn</span>: () <span class="text-[#569cd6]">=&gt;</span> <span class="text-[#dcdcaa]">fetchUsers</span>(<span class="text-[#9cdcfe]">page</span>.value, <span class="text-[#9cdcfe]">status</span>?.value),
@@ -129,7 +129,7 @@
 }
 
 <span class="text-[#6a9955]">// 3. Mutation Hook (생성)</span>
-<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">useCreateUserMutation</span> = () <span class="text-[#569cd6]">=&gt;</span> {
+<span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">useCreateUser</span> = () <span class="text-[#569cd6]">=&gt;</span> {
   <span class="text-[#569cd6]">const</span> <span class="text-[#4fc1ff]">queryClient</span> = <span class="text-[#dcdcaa]">useQueryClient</span>()
   
   <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">useMutation</span>({
@@ -173,15 +173,15 @@
           <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
             <div class="flex items-center px-4 py-2 bg-[#252526] border-b border-gray-800">
               <span class="text-gray-400 font-bold">Child (Case A)</span>
-              <span class="text-gray-500 ml-2">| src/components/UserList.vue</span>
+              <span class="text-gray-500 ml-2">| src/features/user/ui/UserList.vue</span>
             </div>
             <pre
               v-pre
               class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
             ><code><span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">script</span> <span class="text-[#9cdcfe]">setup</span> <span class="text-[#9cdcfe]">lang</span>=<span class="text-[#ce9178]">"ts"</span><span class="text-[#808080]">&gt;</span>
-<span class="text-[#c586c0]">import</span> <span class="text-[#dcdcaa]">{</span> <span class="text-[#9cdcfe]">useUserListQuery</span> <span class="text-[#dcdcaa]">}</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/composables/queries/useUserQuery'</span>
+<span class="text-[#c586c0]">import</span> <span class="text-[#dcdcaa]">{</span> <span class="text-[#9cdcfe]">useUserList</span> <span class="text-[#dcdcaa]">}</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/features/user/model'</span>
 
-<span class="text-[#569cd6]">const</span> { <span class="text-[#9cdcfe]">data</span>: <span class="text-[#4fc1ff]">users</span>, <span class="text-[#4fc1ff]">suspense</span> } = <span class="text-[#dcdcaa]">useUserListQuery</span>(<span class="text-[#4fc1ff]">page</span>)
+<span class="text-[#569cd6]">const</span> { <span class="text-[#9cdcfe]">data</span>: <span class="text-[#4fc1ff]">users</span>, <span class="text-[#4fc1ff]">suspense</span> } = <span class="text-[#dcdcaa]">useUserList</span>(<span class="text-[#4fc1ff]">page</span>)
 
 <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">suspense</span>()
 <span class="text-[#808080]">&lt;/</span><span class="text-[#569cd6]">script</span><span class="text-[#808080]">&gt;</span>
@@ -222,16 +222,16 @@
         <div class="bg-[#1e1e1e] rounded-lg shadow-xl border border-gray-800 font-mono text-sm">
           <div class="flex items-center px-4 py-2 bg-[#252526] border-b border-gray-800">
             <span class="text-gray-400 font-bold">Child (Case B)</span>
-            <span class="text-gray-500 ml-2">| src/components/WeatherWidget.vue</span>
+            <span class="text-gray-500 ml-2">| src/features/widget/ui/WeatherWidget.vue</span>
           </div>
           <pre
             v-pre
             class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
           ><code><span class="text-[#808080]">&lt;</span><span class="text-[#569cd6]">script</span> <span class="text-[#9cdcfe]">setup</span> <span class="text-[#9cdcfe]">lang</span>=<span class="text-[#ce9178]">"ts"</span><span class="text-[#808080]">&gt;</span>
-<span class="text-[#c586c0]">import</span> <span class="text-[#dcdcaa]">{</span> <span class="text-[#9cdcfe]">useWeatherQuery</span> <span class="text-[#dcdcaa]">}</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/composables/queries/useWizetQuery'</span>
+<span class="text-[#c586c0]">import</span> <span class="text-[#dcdcaa]">{</span> <span class="text-[#9cdcfe]">useWeather</span> <span class="text-[#dcdcaa]">}</span> <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/features/widget/model'</span>
 
 <span class="text-[#6a9955]">// 💡 자체 처리를 위해 isError를 가져옵니다.</span>
-<span class="text-[#569cd6]">const</span> { <span class="text-[#9cdcfe]">data</span>: <span class="text-[#4fc1ff]">weather</span>, <span class="text-[#4fc1ff]">suspense</span>, <span class="text-[#4fc1ff]">isError</span> } = <span class="text-[#dcdcaa]">useWeatherQuery</span>()
+<span class="text-[#569cd6]">const</span> { <span class="text-[#9cdcfe]">data</span>: <span class="text-[#4fc1ff]">weather</span>, <span class="text-[#4fc1ff]">suspense</span>, <span class="text-[#4fc1ff]">isError</span> } = <span class="text-[#dcdcaa]">useWeather</span>()
 
 <span class="text-[#c586c0]">try</span> {
   <span class="text-[#c586c0]">await</span> <span class="text-[#dcdcaa]">suspense</span>()

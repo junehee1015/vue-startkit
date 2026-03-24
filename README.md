@@ -6,6 +6,7 @@
 ## ✨ Key Features
 
 - **Architecture**:
+  - **FSD-Lite**: 도메인 응집도(Domain Colocation)의 핵심 철학만 적용한 아키텍처
   - **3-Layer Fetching**: `API Definition` -> `Query Composable` -> `View Component`
 - **Developer Experience**:
   - **Auto Import**: Vue, Router, Pinia, Zod 등 자동 임포트
@@ -34,21 +35,22 @@
 ```text
 src/
 ├── api/
-│   ├── modules/            # 도메인별 API 정의 (user.ts, auth.ts...)
 │   └── request.ts          # Ofetch 인스턴스 (Interceptor & Token Logic)
 ├── assets/                 # 정적 리소스 (Images, Fonts, CSS)
-├── components/
-│   ├── common/             # 원자 단위 공통 컴포넌트 (BaseButton, BaseInput, ErrorBoundary...)
-│   ├── guide/              # (개발 가이드용 컴포넌트 - 배포 시 제외 가능)
-│   └── layouts/            # layouts 공통 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
-├── composables/            # 재사용 가능한 로직
-│   └── queries/            # TanStack Query, key 훅 모음 (useUserQueries.ts)
+├── components/             # 공통 컴포넌트 (BaseInput.vue, BaseButton.vue...)
+│   └── layout/             # layouts 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
+├── composables/            # 전역으로 재사용 가능한 로직 정의 (useConfirm.ts...)
 ├── constants/              # 상수
 │   └── routes.ts           # router name 상수 모음
+├── features/               # 도메인별 비즈니스 로직
+│   └── auth/               # 인증 관련 (로그인 등)
+│       ├── api/            # 서버 통신 로직 (index.ts, user.api.ts 등)
+│       ├── model/          # 비즈니스 로직 및 상태 관리 (composables, stores 통합)
+│       └── ui/             # 도메인 별 컴포넌트
 ├── layouts/                # 페이지 레이아웃 (Default, Empty)
 ├── pages/                  # 파일 기반 라우팅 (File-based Routing)
 ├── plugins/                # App Bootstrapping (Pinia, Router, Query 설정 분리)
-├── stores/                 # Pinia 전역 스토어 (Client State)
+├── stores/                 # Pinia 전역 스토어
 ├── types/                  # TypeScript 인터페이스 및 Zod 스키마
 └── utils/                  # 순수 헬퍼 함수
 ```
@@ -92,10 +94,11 @@ VITE_APP_TITLE=My Vue App
 
 데이터 흐름을 명확히 하기 위해 API 호출을 3단계로 분리합니다.
 
-**Step 1: API 정의 (`src/api/modules/*.ts`) Named Export(개별 함수)** 형태로 정의하여 불필요한 코드가 번들에 포함되지 않도록 합니다.
+**Step 1: API 정의 (`src/features/[도메인]/api/index.ts`) Named Export(개별 함수)** 형태로 정의하여 불필요한 코드가 번들에 포함되지 않도록 합니다.
 
 ```typescript
-// src/api/modules/user.ts
+import { request } from '@/api/request'
+
 export const fetchUsers = (page: number, status?: string) => {
   return request<User[]>('/users', {
     query: { page, status },
@@ -110,10 +113,10 @@ export const createUser = (body) => {
 }
 ```
 
-**Step 2: Composable 생성 (`src/composables/queries/*.ts`)** **Query Key Factory Pattern**을 적용하여 키를 관리하고, TanStack Query 옵션을 캡슐화합니다.
+**Step 2: Composable 생성 (`src/features/[도메인]/model/composables/*.ts`)** **Query Key Factory Pattern**을 적용하여 키를 관리하고, TanStack Query 옵션을 캡슐화합니다.
 
 ```typescript
-import { fetchUsers, createUser } from '@/api/modules/users'
+import { fetchUsers, createUser } from '@/features/user/api'
 import type { Ref } from 'vue'
 
 // 1. Key Factory Pattern (배열 형태의 확장 가능한 키 구조)
@@ -124,7 +127,7 @@ export const userKeys = {
 }
 
 // 2. Query Hook (목록 조회)
-export const useUserListQuery = (page: Ref<number>, status?: Ref<string>) => {
+export const useUserList = (page: Ref<number>, status?: Ref<string>) => {
   return useQuery({
     queryKey: userKeys.list(page, status), // 반응형 변수가 변경되면 자동 재요청
     queryFn: () => fetchUsers(page.value, status?.value),
@@ -132,7 +135,7 @@ export const useUserListQuery = (page: Ref<number>, status?: Ref<string>) => {
 }
 
 // 3. Mutation Hook (생성)
-export const useCreateUserMutation = () => {
+export const useCreateUser = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -157,11 +160,11 @@ export const useCreateUserMutation = () => {
 에러 발생 시 부모 컴포넌트에서 에러를 가로챕니다. 자식은 성공했을 때의 UI만 작성합니다.
 
 ```typescript
-// src/components/UserList.vue - Children
+// src/features/user/ui/UserList.vue - Children
 <script setup lang="ts">
-import { useUserListQuery } from '@/composables/queries/useUserQuery'
+import { useUserList } from '@/features/user/model'
 
-const { data: users, suspense } = useUserListQuery(page)
+const { data: users, suspense } = useUserList(page)
 
 await suspense()
 </script>
@@ -174,7 +177,7 @@ await suspense()
 ```
 
 ```vue
-// src/pages/users/index.vue - Parent
+// src/pages/user/index.vue - Parent
 <template>
   <!-- query-key를 넘겨주면 캐시 자동 초기화 기능을 제공합니다. -->
   <ErrorBoundary :query-key="userKeys.all">
@@ -190,12 +193,12 @@ await suspense()
 실패해도 페이지 전체가 깨지면 안 되는 경우, try-catch로 자식 내부에서 에러를 처리합니다.
 
 ```vue
-// src/components/WeatherWidget.vue - Children
+// src/features/widget/ui/WeatherWidget.vue - Children
 <script setup lang="ts">
-import { useWeatherQuery } from '@/composables/queries/useWidgetQuery'
+import { useWeather } from '@/features/widget/model'
 
 // 💡 자체 처리를 위해 isError를 가져옵니다.
-const { data: weather, suspense, isError } = useWeatherQuery()
+const { data: weather, suspense, isError } = useWeather()
 
 try {
   await suspense()
@@ -239,6 +242,7 @@ definePage({
   meta: {
     layout: DefaultLayout, // 레이아웃 지정 (기본값: Default)
     requiresAuth: false, // 공개 페이지 (기본값: true - Whitelist 방식)
+    guestOnly: true, // 로그인 안한 유저만 접근 가능한 페이지일 때 설정 (로그인, 회원가입)
     title: '로그인',
   },
 })

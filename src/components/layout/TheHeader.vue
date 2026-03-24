@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { User, Settings, LogOut } from 'lucide-vue-next'
-import type { DropdownItem } from '@/components/common/BaseDropdown.vue'
-import { toast } from 'vue-sonner'
+import type { DropdownItem } from '../BaseDropdown.vue'
 import { ROUTE_NAMES } from '@/constants/routes'
+import { useAuthStore, useLogout } from '@/features/auth/model'
 
 const route = useRoute()
 const router = useRouter()
-const { logout } = useAuth()
+const { mutate: logout } = useLogout()
+const authStore = useAuthStore()
 
 const breadcrumbs = computed(() => {
   return route.matched
@@ -33,9 +34,8 @@ const excuteLogout = async () => {
 
   if (!isConfirmed) return
 
-  await logout()
+  logout()
   await router.replace({ name: ROUTE_NAMES.LOGIN })
-
   toast.error('로그아웃 되었습니다.')
 }
 </script>
@@ -61,8 +61,12 @@ const excuteLogout = async () => {
           </div>
 
           <div class="flex flex-col text-left">
-            <span class="text-sm text-gray-700 font-medium leading-none">Juny Jo</span>
-            <span class="text-[10px] text-gray-400 leading-none mt-0.5">Admin</span>
+            <span class="text-sm text-gray-700 font-medium leading-none">{{
+              authStore.user!.name
+            }}</span>
+            <span class="text-[10px] text-gray-400 leading-none mt-0.5">{{
+              authStore.user!.role
+            }}</span>
           </div>
         </button>
       </BaseDropdown>

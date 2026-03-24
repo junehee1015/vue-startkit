@@ -11,13 +11,13 @@ interface Props {
 
 const { disabled = false, class: className, id } = defineProps<Props>()
 
-const checked = defineModel<boolean>('checked')
+const checked = defineModel<boolean>()
 const checkboxId = id || useId()
 </script>
 
 <template>
   <CheckboxRoot
-    v-model:checked="checked"
+    v-model="checked"
     :id="checkboxId"
     :disabled="disabled"
     :class="

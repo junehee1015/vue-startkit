@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import GuideApi from '@/features/guide/ui/GuideApi.vue'
+import GuideCommon from '@/features/guide/ui/GuideCommon.vue'
+
 definePage({
   name: 'guide',
   meta: {

@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/features/auth/model'
 import { ofetch } from 'ofetch'
 import type { FetchOptions, FetchError } from 'ofetch'
 
@@ -16,36 +17,17 @@ const _apiInstance = ofetch.create({
   },
 })
 
-const logout = async () => {
-  try {
-    // await ofetch('/logout', { baseURL: BASE_URL, method: 'POST' })
-  } catch (error) {
-    console.error('Logout API failed, but forcing local logout', error)
-  } finally {
-    const authStore = useAuthStore()
-    authStore.clearAuthData()
-    await nextTick()
-    localStorage.removeItem('auth')
-
-    const { default: router } = await import('@/router')
-    if (router.currentRoute.value.path !== '/login') router.replace('/login')
-  }
-}
-
 // 토큰 갱신
-const refreshAccessToken = async (): Promise<void> => {
+export const refreshAccessToken = async (): Promise<void> => {
   try {
     const authStore = useAuthStore()
-
-    if (!authStore.refreshToken) {
-      throw new Error('No refresh token available')
-    }
+    if (!authStore.refreshToken || !authStore.user) throw new Error('No refresh token')
 
     // const response = await ofetch<{ accessToken: string; refreshToken: string; user: User }>(
     //   '/refresh',
     //   {
     //     baseURL: BASE_URL,
-    //     method: 'POST',
+    //     method: 'POST'
     //     body: {
     //       refreshToken: authStore.refreshToken,
     //     },
@@ -57,16 +39,39 @@ const refreshAccessToken = async (): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 500))
 
     const newAccessToken = 'new-access-token-' + Date.now()
-    const newRefreshToken = 'new-refresh-token-' + Date.now()
     const mockUser = {
       name: 'Juny Jo',
       email: authStore.user!.email,
       role: 'Admin',
     }
 
-    authStore.setAuthData(newAccessToken, newRefreshToken, mockUser)
+    authStore.setAuthData(newAccessToken, authStore.refreshToken, mockUser)
+  } catch (error) {
+    throw error
   } finally {
     refreshPromise = null
+  }
+}
+
+const logout = async () => {
+  try {
+    await ofetch('/logout', { baseURL: BASE_URL, method: 'POST' })
+  } catch (error) {
+    console.error('Logout API failed, but forcing local logout', error)
+  } finally {
+    const authStore = useAuthStore()
+    authStore.clearAuthData()
+    await nextTick()
+    localStorage.removeItem('auth')
+  }
+}
+
+const redirectLogin = async () => {
+  try {
+    const { default: router } = await import('@/router')
+    if (router.currentRoute.value.path !== '/login') router.replace('/login')
+  } catch {
+    location.href = '/login'
   }
 }
 
@@ -110,6 +115,7 @@ export const request = async <T = unknown>(
 
         // 토큰 갱신 실패 시 로그아웃
         await logout()
+        await redirectLogin()
 
         throw refreshError
       }

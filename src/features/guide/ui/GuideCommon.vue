@@ -217,11 +217,11 @@ const scrollTo = (id: string) => {
 
             <div class="space-y-3 pt-2">
               <div class="flex items-center gap-2">
-                <BaseCheckbox id="noti-check" v-model:checked="form.notifications" />
+                <BaseCheckbox id="noti-check" v-model="form.notifications" />
                 <BaseLabel for="noti-check" class="cursor-pointer">알림 받기</BaseLabel>
               </div>
               <div class="flex items-center gap-2">
-                <BaseSwitch id="marketing-switch" v-model:checked="form.marketing" />
+                <BaseSwitch id="marketing-switch" v-model="form.marketing" />
                 <BaseLabel for="marketing-switch" class="cursor-pointer"
                   >마케팅 정보 수신</BaseLabel
                 >

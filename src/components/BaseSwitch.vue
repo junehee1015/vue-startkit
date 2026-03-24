@@ -9,12 +9,12 @@ interface Props {
 }
 
 const { id, disabled = false, class: className } = defineProps<Props>()
-const checked = defineModel<boolean>('checked')
+const checked = defineModel<boolean>()
 </script>
 
 <template>
   <SwitchRoot
-    v-model:checked="checked"
+    v-model="checked"
     :id="id"
     :disabled="disabled"
     :class="
