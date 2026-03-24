@@ -1,6 +1,6 @@
+import { ofetch, type FetchOptions, FetchError } from 'ofetch'
+import { queryClient } from '@/plugins/vue-query'
 import { useAuthStore } from '@/features/auth/model'
-import { ofetch } from 'ofetch'
-import type { FetchOptions, FetchError } from 'ofetch'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -61,8 +61,8 @@ const logout = async () => {
   } finally {
     const authStore = useAuthStore()
     authStore.clearAuthData()
-    await nextTick()
     localStorage.removeItem('auth')
+    queryClient.clear()
   }
 }
 

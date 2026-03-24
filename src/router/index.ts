@@ -31,6 +31,8 @@ router.beforeEach(async (to) => {
   if (isAuthenticated && isGuestOnly) return { name: ROUTE_NAMES.HOME }
 
   if (!isAuthenticated && !isGuestOnly && !isPublic) return { name: ROUTE_NAMES.LOGIN }
+
+  return true // 나머지 통과 (명시적으로 작성)
 })
 
 router.afterEach(() => {
