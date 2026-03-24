@@ -3,7 +3,7 @@ import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore } from '@/features/auth/model'
 import { refreshAccessToken } from '@/api/request'
-import NProgress from 'nprogress'
+import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 const router = createRouter({
@@ -12,7 +12,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  NProgress.start()
+  nProgress.start()
 
   const authStore = useAuthStore()
 
@@ -36,7 +36,7 @@ router.beforeEach(async (to) => {
 })
 
 router.afterEach(() => {
-  NProgress.done()
+  nProgress.done()
 })
 
 if (import.meta.hot) {

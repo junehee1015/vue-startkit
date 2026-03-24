@@ -10,9 +10,10 @@ export const useLogout = () => {
     onError: (error) => {
       console.warn('Backend logout failed, but clearing local data forcefully.', error)
     },
-    onSettled: () => {
+    onSettled: async () => {
       authStore.clearAuthData()
       queryClient.clear()
+      await nextTick()
       localStorage.removeItem('auth')
     },
   })

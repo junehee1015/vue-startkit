@@ -3,6 +3,7 @@ import { User, Settings, LogOut } from 'lucide-vue-next'
 import type { DropdownItem } from '../BaseDropdown.vue'
 import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore, useLogout } from '@/features/auth/model'
+import nProgress from 'nprogress'
 
 const route = useRoute()
 const router = useRouter()
@@ -34,9 +35,14 @@ const excuteLogout = async () => {
 
   if (!isConfirmed) return
 
-  logout()
-  await router.replace({ name: ROUTE_NAMES.LOGIN })
-  toast.error('로그아웃 되었습니다.')
+  nProgress.start()
+  logout(undefined, {
+    onSettled: async () => {
+      await router.replace({ name: ROUTE_NAMES.LOGIN })
+      toast.error('로그아웃 되었습니다.')
+      nProgress.done()
+    },
+  })
 }
 </script>
 
@@ -62,10 +68,10 @@ const excuteLogout = async () => {
 
           <div class="flex flex-col text-left">
             <span class="text-sm text-gray-700 font-medium leading-none">{{
-              authStore.user!.name
+              authStore.user?.name
             }}</span>
             <span class="text-[10px] text-gray-400 leading-none mt-0.5">{{
-              authStore.user!.role
+              authStore.user?.role
             }}</span>
           </div>
         </button>
