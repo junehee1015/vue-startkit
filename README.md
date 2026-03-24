@@ -35,26 +35,28 @@
 ```text
 src/
 ├── api/
-│   └── request.ts          # Ofetch 인스턴스 (Interceptor & Token Logic)
-├── assets/                 # 정적 리소스 (Images, Fonts, CSS)
-├── components/             # 공통 컴포넌트 (BaseInput.vue, BaseButton.vue...)
-│   └── layout/             # layouts 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
-├── composables/            # 전역으로 재사용 가능한 로직 정의 (useConfirm.ts...)
-├── constants/              # 상수
-│   └── routes.ts           # router name 상수 모음
-├── features/               # 도메인별 비즈니스 로직
-│   └── auth/               # 인증 관련 (로그인 등)
-│       ├── api/            # 서버 통신 로직 (index.ts, user.api.ts 등)
-│       ├── model/          # 비즈니스 로직 및 상태 관리 (composables, stores 통합)
-│       └── ui/             # 도메인 별 컴포넌트
-├── layouts/                # 페이지 레이아웃 (Default, Empty)
-├── pages/                  # 파일 기반 라우팅 (File-based Routing)
-├── plugins/                # App Bootstrapping (Pinia, Router, Query 설정 분리)
-├── router/                 #
-│   └── index.ts            # 네비게이션 가드
-├── stores/                 # Pinia 전역 스토어
-├── types/                  # TypeScript 인터페이스 및 Zod 스키마
-└── utils/                  # 순수 헬퍼 함수
+│   └── request.ts           # Ofetch 인스턴스 (Interceptor & Token Logic)
+├── assets/                  # 정적 리소스 (Images, Fonts, CSS)
+├── components/              # 공통 컴포넌트 (BaseInput.vue, BaseButton.vue...)
+│   └── layout/              # layouts 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
+├── composables/             # 전역으로 재사용 가능한 로직 정의 (useConfirm.ts...)
+├── constants/               # 상수
+│   └── routes.ts            # router name 상수 모음
+├── features/                # 도메인별 비즈니스 로직
+│   └── auth/                # 인증 관련 (로그인 등)
+│       ├── api/             # 서버 통신 로직 (index.ts, user.api.ts 등)
+│       ├── model/           # 비즈니스 로직 및 상태 관리 (composables, stores 통합)
+│       │   ├── composables/ # 도메인 커스텀 훅
+│       │   └── store.ts     # 도메인 Pinia 스토어
+│       └── ui/              # 도메인 별 컴포넌트
+├── layouts/                 # 페이지 레이아웃 (Default, Empty)
+├── pages/                   # 파일 기반 라우팅 (File-based Routing)
+├── plugins/                 # App Bootstrapping (Pinia, Router, Query 설정 분리)
+├── router/                  #
+│   └── index.ts             # 네비게이션 가드
+├── stores/                  # Pinia 전역 스토어
+├── types/                   # TypeScript 인터페이스 및 Zod 스키마
+└── utils/                   # 순수 헬퍼 함수
 ```
 
 ## 🚀 Getting Started
