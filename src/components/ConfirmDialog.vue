@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useConfirmState } from '@/composables/useConfirm'
 import {
   AlertDialogRoot,
   AlertDialogPortal,

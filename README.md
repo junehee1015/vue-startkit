@@ -34,8 +34,6 @@
 
 ```text
 src/
-├── api/
-│   └── request.ts           # Ofetch 인스턴스 (Interceptor & Token Logic)
 ├── assets/                  # 정적 리소스 (Images, Fonts, CSS)
 ├── components/              # 공통 컴포넌트 (BaseInput.vue, BaseButton.vue...)
 │   └── layout/              # layouts 컴포넌트 (TheHeader.vue, TheSidebar.vue...)
@@ -50,9 +48,11 @@ src/
 │       │   └── store.ts     # 도메인 Pinia 스토어
 │       └── ui/              # 도메인 별 컴포넌트
 ├── layouts/                 # 페이지 레이아웃 (Default, Empty)
+├── lib/
+│   └── api.ts               # Ofetch 인스턴스 (Interceptor & Token Logic)
 ├── pages/                   # 파일 기반 라우팅 (File-based Routing)
 ├── plugins/                 # App Bootstrapping (Pinia, Router, Query 설정 분리)
-├── router/                  #
+├── router/
 │   └── index.ts             # 네비게이션 가드
 ├── stores/                  # Pinia 전역 스토어
 ├── types/                   # TypeScript 인터페이스 및 Zod 스키마
@@ -84,7 +84,7 @@ npm run build
 루트 경로에 `.env` 파일을 생성하고 API 주소를 설정하세요.
 
 ```env
-VITE_API_URL=http://localhost:8080/api
+VITE_API_URL=http://localhost:8080
 VITE_APP_TITLE=My Vue App
 ```
 
@@ -101,16 +101,16 @@ VITE_APP_TITLE=My Vue App
 **Step 1: API 정의 (`src/features/[도메인]/api/index.ts`) Named Export(개별 함수)** 형태로 정의하여 불필요한 코드가 번들에 포함되지 않도록 합니다.
 
 ```typescript
-import { request } from '@/api/request'
+import { api } from '@/lib/api'
 
 export const fetchUsers = (page: number, status?: string) => {
-  return request<User[]>('/users', {
+  return api<User[]>('/users', {
     query: { page, status },
   })
 }
 
 export const createUser = (body) => {
-  return request<User>('/users', {
+  return api<User>('/users', {
     method: 'POST',
     body,
   })
@@ -221,7 +221,7 @@ try {
 
 ### 2. Authentication (Token Refresh)
 
-`src/api/request.ts`에는 강력한 **토큰 갱신 로직**이 내장되어 있습니다.
+`src/lib/api.ts`에는 강력한 **토큰 갱신 로직**이 내장되어 있습니다.
 
 - **Auto Injection**: Access Token이 있으면 헤더에 자동 주입됩니다.
 - **Concurrency Control**: 여러 API가 동시에 401 에러를 맞아도, **토큰 갱신 요청은 딱 한 번만** 실행됩니다. (Promise Locking 패턴 적용)

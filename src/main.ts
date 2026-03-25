@@ -6,7 +6,17 @@ import '@/assets/css/main.css'
 import 'vue-sonner/style.css'
 import { registerPlugins } from './plugins'
 
+const enableMocking = async () => {
+  if (import.meta.env.PROD) {
+    return
+  }
+  const { worker } = await import('@/mocks/browser')
+  return worker.start({ onUnhandledRequest: 'bypass' })
+}
+
 const initApp = async () => {
+  await enableMocking()
+
   const app = createApp(App)
 
   registerPlugins(app)

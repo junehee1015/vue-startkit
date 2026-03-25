@@ -62,17 +62,17 @@
 
         <pre
           class="p-4 overflow-x-auto leading-relaxed text-[#d4d4d4]"
-        ><code><span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">request</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/api/request'</span>
+        ><code><span class="text-[#c586c0]">import</span> { <span class="text-[#9cdcfe]">api</span> } <span class="text-[#c586c0]">from</span> <span class="text-[#ce9178]">'@/lib/api'</span>
 
 <span class="text-[#6a9955]">// 파라미터를 받아 query 객체로 전달합니다</span>
 <span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">fetchUsers</span> = (<span class="text-[#9cdcfe]">page</span>: <span class="text-[#4ec9b0]">number</span>, <span class="text-[#9cdcfe]">status</span>?: <span class="text-[#4ec9b0]">string</span>) <span class="text-[#569cd6]">=&gt;</span> {
-  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">request</span>&lt;<span class="text-[#4ec9b0]">User</span>[]&gt;(<span class="text-[#ce9178]">'/users'</span>, {
+  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">api</span>&lt;<span class="text-[#4ec9b0]">User</span>[]&gt;(<span class="text-[#ce9178]">'/users'</span>, {
     <span class="text-[#9cdcfe]">query</span>: { <span class="text-[#9cdcfe]">page</span>, <span class="text-[#9cdcfe]">status</span> },
   })
 }
 
 <span class="text-[#c586c0]">export</span> <span class="text-[#569cd6]">const</span> <span class="text-[#dcdcaa]">createUser</span> = (<span class="text-[#9cdcfe]">body</span>: <span class="text-[#4ec9b0]">Partial</span>&lt;<span class="text-[#4ec9b0]">User</span>&gt;) <span class="text-[#569cd6]">=&gt;</span> {
-  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">request</span>&lt;<span class="text-[#4ec9b0]">User</span>&gt;(<span class="text-[#ce9178]">'/users'</span>, {
+  <span class="text-[#c586c0]">return</span> <span class="text-[#dcdcaa]">api</span>&lt;<span class="text-[#4ec9b0]">User</span>&gt;(<span class="text-[#ce9178]">'/users'</span>, {
     <span class="text-[#9cdcfe]">method</span>: <span class="text-[#ce9178]">'POST'</span>,
     <span class="text-[#9cdcfe]">body</span>,
   })

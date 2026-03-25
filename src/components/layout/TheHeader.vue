@@ -4,6 +4,7 @@ import type { DropdownItem } from '../BaseDropdown.vue'
 import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore, useLogout } from '@/features/auth/model'
 import nProgress from 'nprogress'
+import { useConfirm } from '@/composables/useConfirm'
 
 const route = useRoute()
 const router = useRouter()

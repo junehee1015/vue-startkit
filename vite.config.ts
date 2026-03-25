@@ -29,13 +29,13 @@ export default defineConfig({
           '@tanstack/vue-query': ['useQuery', 'useMutation', 'useQueryClient', 'useSuspenseQuery'],
         },
       ],
-      dirs: ['./src/composables', './src/stores'],
+      dirs: [],
       dts: 'src/types/auto-imports.d.ts',
       vueTemplate: true,
     }),
     Components({
+      dirs: ['./src/components/**'],
       dts: 'src/types/components.d.ts',
-      dirs: ['./src/components/**', './src/layouts/**'],
     }),
   ],
   server: {

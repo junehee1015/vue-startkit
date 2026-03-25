@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore } from '@/features/auth/model'
-import { refreshAccessToken } from '@/api/request'
+import { refreshAccessToken } from '@/lib/api'
 import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
