@@ -87,7 +87,7 @@ pnpm run dev:mock
 pnpm run build
 ```
 
-### 4. 환경 변수 설정 (.env)
+### 5. 환경 변수 설정 (.env)
 
 루트 경로에 `.env` 파일을 생성하고 API 주소를 설정하세요.
 
