@@ -7,9 +7,8 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: logoutApi,
-    onError: (error) => {
-      console.warn('Backend logout failed, but clearing local data forcefully.', error)
-    },
+    onError: (error) =>
+      console.warn('Backend logout failed, but clearing local data forcefully.', error),
     onSettled: async () => {
       authStore.clearAuthData()
       queryClient.clear()

@@ -4,17 +4,17 @@ import { api } from '@/lib/api'
 
 interface LoginResponse {
   accessToken: string
+  email: string
   user: User
 }
 
-export const loginApi = async (body: LoginPayload) => {
-  return ofetch<LoginResponse>('login', {
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
+const BASE_URL = import.meta.env.VITE_API_URL || '/api'
+
+export const loginApi = (body: LoginPayload) =>
+  ofetch<LoginResponse>('login', {
+    baseURL: BASE_URL,
     method: 'post',
     body,
   })
-}
 
-export const logoutApi = async () => {
-  return api<void>('logout', { method: 'post' })
-}
+export const logoutApi = () => api<void>('logout', { method: 'post', credentials: 'include' })

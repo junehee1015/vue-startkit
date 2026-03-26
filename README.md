@@ -41,20 +41,22 @@ src/
 ├── constants/               # 상수
 │   └── routes.ts            # router name 상수 모음
 ├── features/                # 도메인별 비즈니스 로직
-│   └── auth/                # 인증 관련 (로그인 등)
+│   └── auth/
 │       ├── api/             # 서버 통신 로직 (index.ts, user.api.ts 등)
 │       ├── model/           # 비즈니스 로직 및 상태 관리 (composables, stores 통합)
-│       │   ├── composables/ # 도메인 커스텀 훅
-│       │   └── store.ts     # 도메인 Pinia 스토어
+│       │   ├── composables/ # 도메인 별 비즈니스 로직
+│       │   └── store.ts     # 도메인 별 Pinia 상태 관리
 │       └── ui/              # 도메인 별 컴포넌트
 ├── layouts/                 # 페이지 레이아웃 (Default, Empty)
 ├── lib/
 │   └── api.ts               # Ofetch 인스턴스 (Interceptor & Token Logic)
+├── mocks/                   # MSW (목업 BE)
+│   └── handlers             # 목업 BE (auth.ts ...)
 ├── pages/                   # 파일 기반 라우팅 (File-based Routing)
-├── plugins/                 # App Bootstrapping (Pinia, Router, Query 설정 분리)
+├── plugins/                 # Pinia, Router, Query 등 라이브러리 설정
 ├── router/
 │   └── index.ts             # 네비게이션 가드
-├── stores/                  # Pinia 전역 스토어
+├── stores/                  # Pinia 전역 상태 관리
 ├── types/                   # TypeScript 인터페이스 및 Zod 스키마
 └── utils/                   # 순수 헬퍼 함수
 ```
@@ -64,19 +66,25 @@ src/
 ### 1. 의존성 설치
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. 개발 서버 실행
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
-### 3. 빌드 및 배포
+### 3. Mock(MSW) 서버 실행
 
 ```bash
-npm run build
+pnpm run dev:mock
+```
+
+### 4. 빌드 및 배포
+
+```bash
+pnpm run build
 ```
 
 ### 4. 환경 변수 설정 (.env)
@@ -246,7 +254,6 @@ definePage({
   meta: {
     layout: DefaultLayout, // 레이아웃 지정 (기본값: Default)
     requiresAuth: false, // 공개 페이지 (기본값: true - Whitelist 방식)
-    guestOnly: true, // 로그인 안한 유저만 접근 가능한 페이지일 때 설정 (로그인, 회원가입)
     title: '로그인',
   },
 })

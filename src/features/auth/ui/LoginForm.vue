@@ -42,9 +42,7 @@ const onSubmit = handleSubmit((values) => {
       toast.success('로그인되었습니다.')
       await router.replace({ name: ROUTE_NAMES.HOME })
     },
-    onError: () => {
-      toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
-    },
+    onError: () => toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.'),
   })
 })
 </script>

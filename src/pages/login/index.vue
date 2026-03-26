@@ -8,8 +8,12 @@ definePage({
     layout: EmptyLayout,
     title: '로그인',
     requiresAuth: false,
-    guestOnly: true,
   },
+})
+
+onMounted(() => {
+  if (import.meta.env.VITE_ENABLE_MSW !== 'true') toast.warning('Mock 서버가 아닙니다.')
+  else toast.success('Mock 서버입니다.')
 })
 </script>
 

@@ -6,11 +6,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (payload: LoginPayload) => loginApi(payload),
-    onSuccess: async (response) => {
-      authStore.setAuthData(response.accessToken, response.user)
-    },
-    onError: (error) => {
-      console.error('Login failed:', error)
-    },
+    onSuccess: (response) => authStore.setAuthData(response.accessToken, response.user),
+    onError: (error) => console.error('Login failed:', error),
   })
 }

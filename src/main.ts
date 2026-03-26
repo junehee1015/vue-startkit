@@ -7,9 +7,8 @@ import 'vue-sonner/style.css'
 import { registerPlugins } from './plugins'
 
 const enableMocking = async () => {
-  if (import.meta.env.PROD) {
-    return
-  }
+  if (import.meta.env.VITE_ENABLE_MSW !== 'true') return
+  if (import.meta.env.PROD) return
   const { worker } = await import('@/mocks/browser')
   return worker.start({ onUnhandledRequest: 'bypass' })
 }

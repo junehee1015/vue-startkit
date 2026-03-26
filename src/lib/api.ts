@@ -1,38 +1,56 @@
 import { FetchError, ofetch, type FetchOptions } from 'ofetch'
 import { queryClient } from '@/plugins/vue-query'
 import { useAuthStore } from '@/features/auth/model'
-import type { User } from '@/features/auth/model/store'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 let refreshPromise: Promise<void> | null = null
 let logoutPromise: Promise<void> | null = null
 
-export const refreshAccessToken = async (): Promise<void> => {
-  try {
-    const authStore = useAuthStore()
+export const refreshAccessToken = (): Promise<void> => {
+  if (refreshPromise) return refreshPromise
 
-    const response = await ofetch<{ accessToken: string; user: User }>('/refresh', {
-      baseURL: BASE_URL,
-      method: 'POST',
-    })
+  refreshPromise = (async () => {
+    try {
+      const authStore = useAuthStore()
 
-    authStore.setAuthData(response.accessToken, response.user)
-  } catch (error) {
-    throw error
-  }
+      const response = await ofetch<{ accessToken: string }>('/refresh', {
+        baseURL: BASE_URL,
+        method: 'POST',
+        credentials: 'include',
+      })
+
+      authStore.setAuthData(response.accessToken)
+    } catch (error) {
+      throw error
+    } finally {
+      refreshPromise = null
+    }
+  })()
+
+  return refreshPromise
 }
 
-const logout = async () => {
-  try {
-    await ofetch('/logout', { baseURL: BASE_URL, method: 'POST' })
-  } catch (error) {
-    console.error('Logout API failed, but forcing local logout', error)
-  } finally {
-    const authStore = useAuthStore()
-    authStore.clearAuthData()
-    localStorage.removeItem('auth')
-    queryClient.clear()
-  }
+export const logout = (): Promise<void> => {
+  if (logoutPromise) return logoutPromise
+
+  logoutPromise = (async () => {
+    try {
+      await ofetch('/logout', { baseURL: BASE_URL, method: 'POST', credentials: 'include' })
+    } catch (error) {
+      console.error('Logout API failed, but forcing local logout', error)
+    } finally {
+      const authStore = useAuthStore()
+      authStore.clearAuthData()
+      queryClient.clear()
+
+      await nextTick()
+      localStorage.removeItem('auth')
+
+      logoutPromise = null
+    }
+  })()
+
+  return logoutPromise
 }
 
 const redirectToLogin = async () => {
@@ -47,7 +65,7 @@ const redirectToLogin = async () => {
 const _api = ofetch.create({
   baseURL: BASE_URL,
   retry: 0,
-  async onRequest({ options }) {
+  onRequest({ options }) {
     const authStore = useAuthStore()
     if (authStore.accessToken) {
       options.headers = new Headers(options.headers || {})
@@ -64,26 +82,12 @@ export const api = async <T = unknown>(url: string, options?: FetchOptions<'json
     const isAuthPath = url.includes('/login') || url.includes('/refresh')
 
     if (error.response?.status === 401 && !isAuthPath) {
-      // 토큰 갱신 동시성 제어
-      if (!refreshPromise) {
-        refreshPromise = refreshAccessToken().finally(() => {
-          refreshPromise = null
-        })
-      }
-
       try {
-        await refreshPromise
+        await refreshAccessToken()
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError)
 
-        // 로그아웃 동시성 제어
-        if (!logoutPromise) {
-          logoutPromise = logout().finally(() => {
-            logoutPromise = null
-          })
-        }
-
-        await logoutPromise
+        await logout()
         await redirectToLogin()
 
         throw refreshError

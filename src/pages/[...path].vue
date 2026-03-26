@@ -6,7 +6,6 @@ definePage({
   meta: {
     layout: EmptyLayout,
     title: '404 Not Found',
-    requiresAuth: false,
   },
 })
 </script>

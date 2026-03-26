@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore } from '@/features/auth/model'
-import { refreshAccessToken } from '@/lib/api'
+import { logout, refreshAccessToken } from '@/lib/api'
 import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
@@ -20,22 +20,28 @@ router.beforeEach(async (to) => {
   if (!authStore.accessToken && authStore.user) {
     try {
       await refreshAccessToken()
-    } catch {} // 에러 처리를 안해도 아래에서 토큰을 재조회 후 로그인으로 보냄
+    } catch {
+      await logout()
+    }
   }
 
   // 토큰 갱신 이후 다시 토큰 확인
-  const isAuthenticated = !!authStore.accessToken // 토큰 보유 여부
-  const isGuestOnly = to.meta.guestOnly === true // 토큰이 있으 때 접근 불가능한 페이지
-  const isPublic = to.meta.requiresAuth === false || to.matched.length === 0 // 토큰 있을 때 접근 가능한 페이지
+  const isAuthenticated = !!authStore.accessToken
+  const isPublic = to.meta.requiresAuth === false
 
-  if (isAuthenticated && isGuestOnly) return { name: ROUTE_NAMES.HOME }
+  if (isAuthenticated && isPublic) return { name: ROUTE_NAMES.HOME }
 
-  if (!isAuthenticated && !isGuestOnly && !isPublic) return { name: ROUTE_NAMES.LOGIN }
+  if (!isAuthenticated && !isPublic) return { name: ROUTE_NAMES.LOGIN }
 
-  return true // 나머지 통과 (명시적으로 작성)
+  return true
 })
 
 router.afterEach(() => {
+  nProgress.done()
+})
+
+router.onError((error) => {
+  console.error('Router Error:', error)
   nProgress.done()
 })
 
