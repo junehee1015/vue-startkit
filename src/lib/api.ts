@@ -20,8 +20,6 @@ export const refreshAccessToken = (): Promise<void> => {
       })
 
       authStore.setAuthData(response.accessToken)
-    } catch (error) {
-      throw error
     } finally {
       refreshPromise = null
     }
