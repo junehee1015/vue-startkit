@@ -1,4 +1,5 @@
-import { FetchError, ofetch, type FetchOptions } from 'ofetch'
+import { ofetch } from 'ofetch'
+import type { FetchOptions, FetchRequest, FetchError } from 'ofetch'
 import { queryClient } from '@/plugins/vue-query'
 import { useAuthStore } from '@/features/auth/model'
 
@@ -72,12 +73,16 @@ const _api = ofetch.create({
   },
 })
 
-export const api = async <T = unknown>(url: string, options?: FetchOptions<'json'>): Promise<T> => {
+export const api = async <T = unknown>(
+  request: FetchRequest,
+  options?: FetchOptions<'json'>,
+): Promise<T> => {
   try {
-    return await _api<T>(url, options)
+    return await _api<T>(request, options)
   } catch (e) {
     const error = e as FetchError
-    const isAuthPath = url.includes('/login') || url.includes('/refresh')
+    const requestUrl = request instanceof Request ? request.url : request.toString()
+    const isAuthPath = requestUrl.includes('/login') || requestUrl.includes('/refresh')
 
     if (error.response?.status === 401 && !isAuthPath) {
       try {
@@ -91,7 +96,7 @@ export const api = async <T = unknown>(url: string, options?: FetchOptions<'json
         throw refreshError
       }
 
-      return await _api<T>(url, options)
+      return await _api<T>(request, options)
     }
 
     throw error
