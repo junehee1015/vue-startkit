@@ -253,7 +253,7 @@ definePage({
   name: 'login', // ✅ 라우트 이름 고정 (파일 위치가 바뀌어도 안전함)
   meta: {
     layout: DefaultLayout, // 레이아웃 지정 (기본값: Default)
-    requiresAuth: false, // 공개 페이지 (기본값: true - Whitelist 방식)
+    isPublic: true, // 공개 페이지만 작성
     title: '로그인',
   },
 })

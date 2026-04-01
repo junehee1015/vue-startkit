@@ -7,7 +7,7 @@ definePage({
   meta: {
     layout: EmptyLayout,
     title: '로그인',
-    requiresAuth: false,
+    isPublic: false,
   },
 })
 

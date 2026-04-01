@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore } from '@/features/auth/model'
-import { logout, refreshAccessToken } from '@/lib/api'
 import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
@@ -19,15 +18,15 @@ router.beforeEach(async (to) => {
   // 토큰은 없고 사용자 정보만 있는 경우 토큰 갱신
   if (!authStore.accessToken && authStore.user) {
     try {
-      await refreshAccessToken()
+      await authStore.refresh()
     } catch {
-      await logout()
+      await authStore.logout()
     }
   }
 
   // 토큰 갱신 이후 다시 토큰 확인
   const isAuthenticated = !!authStore.accessToken
-  const isPublic = to.meta.requiresAuth === false
+  const isPublic = to.meta.isPublic === true
 
   if (isAuthenticated && isPublic) return { name: ROUTE_NAMES.HOME }
 
