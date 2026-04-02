@@ -49,6 +49,7 @@ export const useAuthStore = defineStore(
           refreshPromise = null
         }
       })()
+
       return refreshPromise
     }
 
@@ -66,8 +67,18 @@ export const useAuthStore = defineStore(
       if (logoutPromise) return logoutPromise
 
       logoutPromise = (async () => {
+        const headers = new Headers()
+        if (accessToken.value) {
+          headers.set('Authorization', `Bearer ${accessToken.value}`)
+        }
+
         try {
-          await ofetch('/logout', { baseURL: BASE_URL, method: 'POST', credentials: 'include' })
+          await ofetch('/logout', {
+            baseURL: BASE_URL,
+            method: 'POST',
+            headers,
+            credentials: 'include',
+          })
         } catch {
           console.warn('Server logout failed.')
         } finally {
@@ -81,6 +92,7 @@ export const useAuthStore = defineStore(
           logoutPromise = null
         }
       })()
+
       return logoutPromise
     }
 
