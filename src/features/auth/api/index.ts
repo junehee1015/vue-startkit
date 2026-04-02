@@ -11,10 +11,6 @@ interface LoginResponse {
 const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 export const loginApi = (body: LoginPayload) =>
-  ofetch<LoginResponse>('login', {
-    baseURL: BASE_URL,
-    method: 'post',
-    body,
-  })
+  ofetch<LoginResponse>('login', { baseURL: BASE_URL, method: 'post', body })
 
 export const logoutApi = () => api<void>('logout', { method: 'post', credentials: 'include' })

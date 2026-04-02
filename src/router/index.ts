@@ -4,6 +4,7 @@ import { ROUTE_NAMES } from '@/constants/routes'
 import { useAuthStore } from '@/features/auth/model'
 import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+import { queryClient } from '@/plugins/vue-query'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,7 +21,10 @@ router.beforeEach(async (to) => {
     try {
       await authStore.refresh()
     } catch {
-      await authStore.logout()
+      authStore.clearAuthData()
+      queryClient.clear()
+      await nextTick()
+      localStorage.removeItem('auth')
     }
   }
 
