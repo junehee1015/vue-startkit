@@ -27,7 +27,10 @@ export const api = async <T = unknown>(
   } catch (e) {
     const error = e as FetchError
     const requestUrl = request instanceof Request ? request.url : request.toString()
-    const isAuthPath = requestUrl.includes('/login') || requestUrl.includes('/refresh')
+    const isAuthPath =
+      requestUrl.includes('/login') ||
+      requestUrl.includes('/logout') ||
+      requestUrl.includes('/refresh')
 
     if (error.response?.status === 401 && !isAuthPath) {
       const authStore = useAuthStore()
