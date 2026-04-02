@@ -16,7 +16,6 @@ router.beforeEach(async (to) => {
 
   const authStore = useAuthStore()
 
-  // 토큰은 없고 사용자 정보만 있는 경우 토큰 갱신
   if (!authStore.accessToken && authStore.user) {
     try {
       await authStore.refresh()
@@ -28,15 +27,19 @@ router.beforeEach(async (to) => {
     }
   }
 
-  // 토큰 갱신 이후 다시 토큰 확인
-  const isAuthenticated = !!authStore.accessToken
-  const isPublic = to.meta.isPublic === true
+  const isAuthenticated = !!authStore.accessToken // 토큰 보유 여부
+  const isPublic = to.meta.isPublic === true // 로그인 & 비로그인 모두 접근 가능
+  const isGuestOnly = to.meta.isGuestOnly === true // 비로그인만 접근 가능
 
-  if (isAuthenticated && isPublic) return { name: ROUTE_NAMES.HOME }
+  if (isGuestOnly) {
+    if (isAuthenticated) return { name: ROUTE_NAMES.HOME }
 
-  if (!isAuthenticated && !isPublic) return { name: ROUTE_NAMES.LOGIN }
+    return true
+  }
 
-  return true
+  if (isPublic) return true
+
+  if (!isAuthenticated) return { name: ROUTE_NAMES.LOGIN }
 })
 
 router.afterEach(() => {
