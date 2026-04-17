@@ -20,17 +20,15 @@ export const api = async <T = unknown>(
   request: FetchRequest,
   options?: FetchOptions<'json'>,
 ): Promise<T> => {
-  const requestToPerform = request instanceof Request ? request.clone() : request
+  const getCloneRequest = () => (request instanceof Request ? request.clone() : request)
+  const getCloneOptions = () => (options ? { ...options } : undefined)
 
   try {
-    return await _api<T>(requestToPerform, options)
+    return await _api<T>(getCloneRequest(), getCloneOptions())
   } catch (e) {
     const error = e as FetchError
     const requestUrl = request instanceof Request ? request.url : request.toString()
-    const isAuthPath =
-      requestUrl.includes('/login') ||
-      requestUrl.includes('/logout') ||
-      requestUrl.includes('/refresh')
+    const isAuthPath = ['/login', '/logout', '/refresh'].some((path) => requestUrl.includes(path))
 
     if (error.response?.status === 401 && !isAuthPath) {
       const authStore = useAuthStore()
@@ -43,8 +41,7 @@ export const api = async <T = unknown>(
         throw refreshError
       }
 
-      const retryRequest = request instanceof Request ? request.clone() : request
-      return await _api<T>(retryRequest, options)
+      return await _api<T>(getCloneRequest(), getCloneOptions())
     }
 
     throw error
