@@ -2,27 +2,48 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from '@/router'
 
-import '@/assets/css/main.css'
 import 'vue-sonner/style.css'
+import '@/assets/css/main.css'
+
 import { registerPlugins } from './plugins'
+import { useAuthStore } from './features/auth/model'
 
 const enableMocking = async () => {
-  if (import.meta.env.VITE_ENABLE_MSW !== 'true') return
-  if (import.meta.env.PROD) return
+  if (import.meta.env.VITE_ENABLE_MSW !== 'true' || import.meta.env.PROD) return
   const { worker } = await import('@/mocks/browser')
   return worker.start({ onUnhandledRequest: 'bypass' })
 }
 
+const refreshAccessToken = async () => {
+  const authStore = useAuthStore()
+  if (!authStore.user) return
+
+  try {
+    await authStore.refresh()
+  } catch (error) {
+    console.warn('Initialization silent refresh failed.', error)
+    authStore.clearAuthData()
+  }
+}
+
 const initApp = async () => {
-  await enableMocking()
+  try {
+    await enableMocking()
 
-  const app = createApp(App)
+    const app = createApp(App)
 
-  registerPlugins(app)
+    registerPlugins(app)
 
-  await router.isReady()
+    await app.runWithContext(() => refreshAccessToken())
 
-  app.mount('#app')
+    app.use(router)
+
+    await router.isReady()
+
+    app.mount('#app')
+  } catch (error) {
+    console.error('Failed to initialize application:', error)
+  }
 }
 
 initApp()
