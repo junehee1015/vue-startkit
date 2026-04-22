@@ -28,7 +28,8 @@ export const api = async <T = unknown>(
   } catch (e) {
     const error = e as FetchError
     const requestUrl = request instanceof Request ? request.url : request.toString()
-    const isAuthPath = ['/login', '/logout', '/refresh'].some((path) => requestUrl.includes(path))
+    const pathname = new URL(requestUrl, 'http://dummy.com').pathname
+    const isAuthPath = ['/login', '/logout', '/refresh'].some((path) => pathname.endsWith(path))
 
     if (error.response?.status === 401 && !isAuthPath) {
       const authStore = useAuthStore()
@@ -38,7 +39,7 @@ export const api = async <T = unknown>(
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError)
         await authStore.logout()
-        throw refreshError
+        return new Promise<T>(() => {})
       }
 
       return await _api<T>(getCloneRequest(), getCloneOptions())

@@ -56,7 +56,7 @@ export const useAuthStore = defineStore(
     const redirectToLogin = async () => {
       try {
         const { default: router } = await import('@/router')
-        if (router.currentRoute.value.path !== ROUTE_NAMES.LOGIN)
+        if (router.currentRoute.value.name !== ROUTE_NAMES.LOGIN)
           await router.replace({ name: ROUTE_NAMES.LOGIN })
       } catch {
         window.location.href = '/login'
@@ -84,11 +84,8 @@ export const useAuthStore = defineStore(
         } finally {
           clearAuthData()
           queryClient.clear()
-          await nextTick()
-          localStorage.removeItem('auth')
 
           await redirectToLogin()
-
           logoutPromise = null
         }
       })()
