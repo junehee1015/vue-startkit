@@ -44,6 +44,9 @@ export const useAuthStore = defineStore(
             method: 'POST',
             credentials: 'include',
           })
+
+          if (logoutPromise) throw new Error('Logout in progress')
+
           setAuthData(response.accessToken)
         } finally {
           refreshPromise = null
